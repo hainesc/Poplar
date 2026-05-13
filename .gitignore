@@ -1,0 +1,26 @@
+# Build output
+bin/
+obj/
+
+# IDE
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+**/[Pp]ackages/*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Native Binaries
+Native/runtimes/
+*.dylib
+*.dll
+*.so
+*.pdb

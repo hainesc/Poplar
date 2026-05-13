@@ -1,0 +1,5 @@
+log_level = "info"
+
+[auth]
+mode = "none"
+secret = "poplar_secret"
