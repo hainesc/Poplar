@@ -63,6 +63,8 @@ public partial class DevicesViewModel : ObservableObject, IRecipient<DeviceStatu
     /// </summary>
     public void Receive(DeviceStatusChangedMessage message)
     {
+        Debug.WriteLine($"[DevicesViewModel] Received status message with {message.Statuses.Length} updates.");
+        
         // Update the statuses on the UI thread
         App.Current.Dispatcher.Invoke(() =>
         {
@@ -72,6 +74,11 @@ public partial class DevicesViewModel : ObservableObject, IRecipient<DeviceStatu
                 if (device != null)
                 {
                     device.Status = status;
+                    Debug.WriteLine($"[DevicesViewModel] Updated UI for Device ID: {status.id} (Online: {status.isOnline})");
+                }
+                else
+                {
+                    Debug.WriteLine($"[DevicesViewModel] Device ID: {status.id} not found in current list.");
                 }
             }
         });

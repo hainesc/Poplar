@@ -61,6 +61,12 @@ public sealed class DeviceService : DeviceObserver, IDisposable
     /// </summary>
     public void OnDevicesHealthChanged(DeviceStatus[] report)
     {
+        Debug.WriteLine($"[DeviceService] Received health update for {report.Length} devices.");
+        foreach (var status in report)
+        {
+            Debug.WriteLine($"  -> Device ID: {status.id}, Name: {status.name}, Online: {status.isOnline}, Msg: {status.message}");
+        }
+
         // Broadcast the update to any interested ViewModels
         WeakReferenceMessenger.Default.Send(new DeviceStatusChangedMessage(report));
     }
