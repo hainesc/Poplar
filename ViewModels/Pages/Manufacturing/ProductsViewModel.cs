@@ -10,6 +10,7 @@ namespace Poplar.ViewModels.Pages.Manufacturing;
 public partial class ProductsViewModel : ObservableObject
 {
     private readonly ProductService _productService;
+    private readonly DeviceService _deviceService;
     private readonly IContentDialogService _dialogService;
     private readonly SessionManager _session;
     private bool _isInitialized;
@@ -19,10 +20,12 @@ public partial class ProductsViewModel : ObservableObject
 
     public ProductsViewModel(
         ProductService productService,
+        DeviceService deviceService,
         IContentDialogService dialogService,
         SessionManager session)
     {
         _productService = productService;
+        _deviceService = deviceService;
         _dialogService = dialogService;
         _session = session;
     }
@@ -50,7 +53,43 @@ public partial class ProductsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnAddProduct()
     {
-        // Implementation for adding product
+        var editVm = new ProductEditViewModel();
+        await editVm.InitializeAsync(_deviceService);
+
+        var content = new Poplar.Views.Pages.Manufacturing.ProductEditControl
+        {
+            DataContext = editVm
+        };
+
+
+        var result = await _dialogService.ShowSimpleDialogAsync(
+            new SimpleContentDialogCreateOptions
+            {
+                Title = "Add New Product",
+                Content = content,
+                PrimaryButtonText = "Save",
+                CloseButtonText = "Cancel"
+            }
+        );
+
+        if (result == ContentDialogResult.Primary)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(editVm.ProductName)) return;
+
+                var devices = editVm.GetSelectedDeviceNames();
+                await _productService.AddProductAsync(editVm.ProductName, devices.Length > 0 ? devices : null);
+
+                // Refresh list
+                _isInitialized = false;
+                await InitializeAsync();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.WriteLine($"[ProductsViewModel] Add product failed: {ex.Message}");
+            }
+        }
     }
 
     [RelayCommand]

@@ -1,0 +1,38 @@
+<UserControl
+    x:Class="Poplar.Views.Pages.Manufacturing.ProductEditControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+
+    <StackPanel Margin="0,10,0,0">
+        <TextBlock
+            Margin="0,0,0,4"
+            Text="Product Name" />
+        <ui:TextBox
+            x:Name="ProductNameBox"
+            Margin="0,0,0,16"
+            PlaceholderText="e.g. Model X Controller"
+            Text="{Binding ProductName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock
+            Margin="0,0,0,8"
+            FontWeight="SemiBold"
+            Text="Associated Devices" />
+        
+        <ui:ListView 
+            MaxHeight="200"
+            ItemsSource="{Binding AvailableDevices}"
+            SelectionMode="Multiple">
+            <ui:ListView.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,2"/>
+                </DataTemplate>
+            </ui:ListView.ItemTemplate>
+        </ui:ListView>
+    </StackPanel>
+</UserControl>
