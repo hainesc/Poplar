@@ -89,10 +89,10 @@
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="#10000000" />
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Status.is_online}" Value="True">
+                                                    <DataTrigger Binding="{Binding Status.isOnline}" Value="True">
                                                         <Setter Property="Background" Value="#2000FF00" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Status.is_online}" Value="False">
+                                                    <DataTrigger Binding="{Binding Status.isOnline}" Value="False">
                                                         <Setter Property="Background" Value="#20FF0000" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -104,11 +104,11 @@
                                                     <Setter Property="Text" Value="OFFLINE" />
                                                     <Setter Property="Foreground" Value="Gray" />
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Status.is_online}" Value="True">
+                                                        <DataTrigger Binding="{Binding Status.isOnline}" Value="True">
                                                             <Setter Property="Text" Value="ONLINE" />
                                                             <Setter Property="Foreground" Value="Green" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status.is_online}" Value="False">
+                                                        <DataTrigger Binding="{Binding Status.isOnline}" Value="False">
                                                             <Setter Property="Text" Value="OFFLINE" />
                                                             <Setter Property="Foreground" Value="Red" />
                                                         </DataTrigger>
