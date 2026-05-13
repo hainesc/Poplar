@@ -33,9 +33,10 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     [ObservableProperty]
     private ObservableCollection<TraceabilityItem> _traceabilityItems = new();
 
-    // Logic Flow Tab (JSON string for now)
-    [ObservableProperty]
-    private string _dagFlowJson = string.Empty;
+    // Logic Flow Tab (Visual Editor)
+    public DagEditorViewModel DagEditor { get; } = new();
+
+    private DagFlow? _originalDag;
 
     public ProductDetailsViewModel(
         ProductService productService,
@@ -117,16 +118,8 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
 
     private async Task LoadDagAsync()
     {
-        var dag = await _productService.GetDagByProductAsync(_productId);
-        if (dag != null)
-        {
-            // Simple JSON representation for now
-            DagFlowJson = System.Text.Json.JsonSerializer.Serialize(dag, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-        }
-        else
-        {
-            DagFlowJson = "{\n  \"nodes\": [],\n  \"edges\": []\n}";
-        }
+        _originalDag = await _productService.GetDagByProductAsync(_productId);
+        DagEditor.LoadFromDagFlow(_originalDag);
     }
 
     [RelayCommand]
@@ -183,7 +176,13 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            var dag = System.Text.Json.JsonSerializer.Deserialize<DagFlow>(DagFlowJson);
+            // Fallback to basic details if original dag is missing (e.g. creating a new one)
+            int dagId = _originalDag?.id ?? 0;
+            string dagName = _originalDag?.name ?? $"{ProductName}_Flow";
+            string entryNode = _originalDag?.entryNode ?? string.Empty;
+
+            var dag = DagEditor.ExportToDagFlow(dagId, dagName, entryNode);
+            
             if (dag != null)
             {
                 await _productService.UpdateDagByProductAsync(_productId, dag);
@@ -192,7 +191,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
         }
         catch (System.Exception ex)
         {
-            ShowError("Save Failed", "Invalid JSON format or backend error.\n" + ex.Message);
+            ShowError("Save Failed", "Failed to save logic flow.\n" + ex.Message);
         }
     }
 

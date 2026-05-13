@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:nodify="https://miroiu.github.io/nodify"
     xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
     xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
     Title="Product Configuration Hub"
@@ -159,16 +160,46 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Margin="0,0,0,8">
-                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="JSON Flow Definition" />
-                        <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Define nodes and edges for the orchestration engine." />
+                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Visual DAG Editor" />
+                        <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Drag nodes and draw connections to configure process logic." />
                     </StackPanel>
 
-                    <TextBox Grid.Row="1"
-                             Text="{Binding ViewModel.DagFlowJson, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             AcceptsReturn="True"
-                             FontFamily="Consolas"
-                             VerticalScrollBarVisibility="Auto"
-                             HorizontalScrollBarVisibility="Auto" />
+                    <Border Grid.Row="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4">
+                        <nodify:NodifyEditor 
+                            DataContext="{Binding ViewModel.DagEditor}"
+                            ItemsSource="{Binding Nodes}"
+                            Connections="{Binding Connections}"
+                            Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                            
+                            <nodify:NodifyEditor.ItemContainerStyle>
+                                <Style TargetType="{x:Type nodify:ItemContainer}">
+                                    <Setter Property="Location" Value="{Binding Location}" />
+                                </Style>
+                            </nodify:NodifyEditor.ItemContainerStyle>
+
+                            <nodify:NodifyEditor.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:FlowNodeViewModel}">
+                                    <nodify:Node Header="{Binding StepType}"
+                                                 Content="{Binding Id}">
+                                        <nodify:Node.Input>
+                                            <nodify:NodeInput Header="In" IsConnected="True"/>
+                                        </nodify:Node.Input>
+                                        <nodify:Node.Output>
+                                            <nodify:NodeOutput Header="Out" IsConnected="True"/>
+                                        </nodify:Node.Output>
+                                    </nodify:Node>
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ItemTemplate>
+
+                            <nodify:NodifyEditor.ConnectionTemplate>
+                                <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
+                                    <nodify:Connection Source="{Binding Source.Location}"
+                                                       Target="{Binding Target.Location}" />
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ConnectionTemplate>
+
+                        </nodify:NodifyEditor>
+                    </Border>
 
                     <ui:Button Grid.Row="2" 
                                Appearance="Primary" 
