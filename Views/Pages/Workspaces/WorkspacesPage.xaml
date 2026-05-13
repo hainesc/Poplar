@@ -38,7 +38,7 @@
                 Margin="0,0,0,24"
                 FontSize="64"
                 Foreground="White"
-                Symbol="Factory24" />
+                Symbol="Building24" />
 
             <ui:TextBlock
                 Margin="0,0,0,8"
