@@ -64,7 +64,7 @@
                                         Height="40"
                                         Background="{DynamicResource ControlFillColorDefaultBrush}"
                                         CornerRadius="8">
-                                        <ui:SymbolIcon FontSize="20" Symbol="Cpu24" />
+                                        <ui:SymbolIcon FontSize="20" Symbol="Desktop24" />
                                     </Border>
 
                                     <StackPanel Grid.Column="1" Margin="12,0,0,0">
@@ -76,7 +76,7 @@
                                         <TextBlock
                                             FontSize="10"
                                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                            Text="{Binding Record.device_type, Converter={StaticResource StringToUppercaseConverter}}" />
+                                            Text="{Binding Record.deviceType, Converter={StaticResource StringToUppercaseConverter}}" />
                                     </StackPanel>
 
                                     <!-- Status Indicator -->
