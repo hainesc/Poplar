@@ -51,6 +51,14 @@ public partial class MainWindowViewModel : ViewModel
     private ObservableCollection<object> _menuItems =
     [
         new NavigationViewItem("Home", SymbolRegular.Home24, typeof(DashboardPage)),
+        new NavigationViewItem("Manufacturing", SymbolRegular.Settings24, null)
+        {
+            MenuItemsSource = new object[]
+            {
+                new NavigationViewItem("Devices", SymbolRegular.SpeakerSettings24, typeof(Poplar.Views.Pages.Manufacturing.DevicesPage)),
+            }
+        },
+        new NavigationViewItemSeparator(),
         new NavigationViewItem()
         {
             Content = "Design guidance",

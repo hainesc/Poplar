@@ -10,6 +10,7 @@ public sealed class BackendService : IDisposable
 {
     private Launcher? _launcher;
     private RbacViewModel? _rbacVm;
+    private DeviceViewModel? _deviceVm;
     private bool _isInitialized;
     private readonly SemaphoreSlim _initLock = new(1, 1);
 
@@ -20,9 +21,14 @@ public sealed class BackendService : IDisposable
 
     /// <summary>
     /// The RBAC ViewModel for authentication and authorization operations.
-    /// Throws if the backend has not been initialized.
     /// </summary>
     public RbacViewModel RbacVm => _rbacVm
+        ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
+
+    /// <summary>
+    /// The Device ViewModel for device management operations.
+    /// </summary>
+    public DeviceViewModel DeviceVm => _deviceVm
         ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
 
     /// <summary>
@@ -47,6 +53,7 @@ public sealed class BackendService : IDisposable
 
             _launcher = await Launcher.LauncherAsync(AppPaths.DatabaseUrl, AppPaths.ConfigFilePath);
             _rbacVm = _launcher.RbacVm();
+            _deviceVm = _launcher.DeviceManager();
 
             _isInitialized = true;
             Debug.WriteLine("[Backend] Initialized successfully.");
@@ -60,6 +67,7 @@ public sealed class BackendService : IDisposable
     public void Dispose()
     {
         _rbacVm?.Dispose();
+        _deviceVm?.Dispose();
         _launcher?.Dispose();
         _initLock.Dispose();
     }

@@ -2,6 +2,7 @@
     x:Class="Poplar.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:Poplar.Converters"
     xmlns:helpers="clr-namespace:Poplar.Helpers"
     xmlns:local="clr-namespace:Poplar"
     xmlns:syntax="clr-namespace:Wpf.Ui.SyntaxHighlight.Markup"
@@ -32,6 +33,7 @@
             <helpers:BoolToToggleHintConverter x:Key="BoolToToggleHint" />
             <helpers:BoolToToggleActionConverter x:Key="BoolToToggleAction" />
             <helpers:NullToFalseConverter x:Key="NullToFalseConverter" />
+            <converters:StringToUppercaseConverter x:Key="StringToUppercaseConverter" />
 
         </ResourceDictionary>
     </Application.Resources>
