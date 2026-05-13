@@ -24,6 +24,7 @@ public partial class DeviceEditViewModel : ObservableObject
     [ObservableProperty] private int _rack = 0;
     [ObservableProperty] private int _slot = 1;
     [ObservableProperty] private int _dbNumber = 1;
+    [ObservableProperty] private int _station = 1;
     [ObservableProperty] private int _hbOffset = 0;
     [ObservableProperty] private int _hbInterval = 5000;
 
@@ -57,6 +58,7 @@ public partial class DeviceEditViewModel : ObservableObject
                     Rack = conn.rack;
                     Slot = conn.slot;
                     DbNumber = conn.db;
+                    Station = conn.station;
                 }
                 if (!string.IsNullOrEmpty(record.healthConfig))
                 {
@@ -103,7 +105,7 @@ public partial class DeviceEditViewModel : ObservableObject
 
         if (Protocol == "s7")
         {
-            connectConfig = JsonSerializer.Serialize(new S7ConnectConfig { host = Host, port = Port, rack = Rack, slot = Slot, db = DbNumber });
+            connectConfig = JsonSerializer.Serialize(new S7ConnectConfig { host = Host, port = Port, rack = Rack, slot = Slot, db = DbNumber, station = Station });
             healthConfig = JsonSerializer.Serialize(new S7HealthConfig { offset = HbOffset, interval_ms = HbInterval });
         }
         else if (Protocol == "serial")

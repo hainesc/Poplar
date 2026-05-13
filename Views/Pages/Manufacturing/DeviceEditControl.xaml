@@ -77,10 +77,21 @@
                         FontWeight="Bold"
                         Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
                         Text="S7 Connection" />
-                    <ui:TextBox
-                        Margin="0,0,0,8"
-                        PlaceholderText="IPv4 Address"
-                        Text="{Binding ViewModel.Host, Mode=TwoWay}" />
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox
+                            Grid.Column="0"
+                            Margin="0,0,8,0"
+                            PlaceholderText="IPv4 Address"
+                            Text="{Binding ViewModel.Host, Mode=TwoWay}" />
+                        <ui:NumberBox
+                            Grid.Column="1"
+                            ClearButtonEnabled="False"
+                            Value="{Binding ViewModel.Port, Mode=TwoWay}" />
+                    </Grid>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -109,6 +120,13 @@
                             <ui:NumberBox Value="{Binding ViewModel.DbNumber, Mode=TwoWay}" />
                         </StackPanel>
                     </Grid>
+                    <StackPanel Margin="0,8,0,0">
+                        <TextBlock
+                            Margin="4,0,0,2"
+                            FontSize="10"
+                            Text="Station ID" />
+                        <ui:NumberBox Value="{Binding ViewModel.Station, Mode=TwoWay}" />
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Serial Config -->
