@@ -127,6 +127,41 @@
                             Text="Station ID" />
                         <ui:NumberBox Value="{Binding ViewModel.Station, Mode=TwoWay}" />
                     </StackPanel>
+
+                    <!-- S7 Health Check -->
+                    <Border
+                        Margin="0,12,0,0"
+                        Padding="8"
+                        Background="{DynamicResource ControlFillColorTertiaryBrush}"
+                        CornerRadius="4">
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,8"
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Text="Heartbeat Monitoring" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock
+                                        Margin="4,0,0,2"
+                                        FontSize="10"
+                                        Text="Offset (Bytes)" />
+                                    <ui:NumberBox Value="{Binding ViewModel.HbOffset, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock
+                                        Margin="4,0,0,2"
+                                        FontSize="10"
+                                        Text="Interval (ms)" />
+                                    <ui:NumberBox Value="{Binding ViewModel.HbInterval, Mode=TwoWay}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
 
                 <!-- Serial Config -->
