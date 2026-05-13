@@ -56,6 +56,7 @@ public partial class MainWindowViewModel : ViewModel
             MenuItemsSource = new object[]
             {
                 new NavigationViewItem("Devices", SymbolRegular.SpeakerSettings24, typeof(Poplar.Views.Pages.Manufacturing.DevicesPage)),
+                new NavigationViewItem("Products", SymbolRegular.Box24, typeof(Poplar.Views.Pages.Manufacturing.ProductsPage)),
             }
         },
         new NavigationViewItemSeparator(),

@@ -10,12 +10,12 @@ namespace Poplar.ViewModels.Pages.Collections;
 public partial class DataGridViewModel : ViewModel
 {
     [ObservableProperty]
-    private ObservableCollection<Product> _productsCollection = GenerateProducts();
+    private ObservableCollection<SampleProduct> _productsCollection = GenerateProducts();
 
-    private static ObservableCollection<Product> GenerateProducts()
+    private static ObservableCollection<SampleProduct> GenerateProducts()
     {
         var random = new Random();
-        var products = new ObservableCollection<Product> { };
+        var products = new ObservableCollection<SampleProduct> { };
 
         var adjectives = new[] { "Red", "Blueberry" };
         var names = new[] { "Marmalade", "Dumplings", "Soup" };
@@ -24,7 +24,7 @@ public partial class DataGridViewModel : ViewModel
         for (int i = 0; i < 50; i++)
         {
             products.Add(
-                new Product
+                new SampleProduct
                 {
                     ProductId = i,
                     ProductCode = i,
@@ -42,4 +42,17 @@ public partial class DataGridViewModel : ViewModel
 
         return products;
     }
+}
+
+public class SampleProduct
+{
+    public int ProductId { get; set; }
+    public int ProductCode { get; set; }
+    public string? ProductName { get; set; }
+    public string? QuantityPerUnit { get; set; }
+    public Unit Unit { get; set; }
+    public double UnitPrice { get; set; }
+    public string UnitPriceString => UnitPrice.ToString("F2");
+    public int UnitsInStock { get; set; }
+    public bool IsVirtual { get; set; }
 }

@@ -47,6 +47,7 @@ public partial class App
 
                 // Backend & Auth
                 _ = services.AddSingleton<BackendService>();
+                _ = services.AddSingleton<ProductService>();
                 _ = services.AddSingleton<SessionManager>();
                 _ = services.AddSingleton<DeviceService>();
 
@@ -63,6 +64,8 @@ public partial class App
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.DevicesViewModel>();
                 _ = services.AddSingleton<Poplar.Views.Pages.Workspaces.WorkspacesPage>();
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Workspaces.WorkspacesViewModel>();
+                _ = services.AddSingleton<Poplar.Views.Pages.Manufacturing.ProductsPage>();
+                _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.ProductsViewModel>();
 
                 // All other pages and view models
                 _ = services.AddTransientFromNamespace("Poplar.Views", GalleryAssembly.Asssembly);
