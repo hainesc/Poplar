@@ -12,6 +12,8 @@ public partial class ProductsViewModel : ObservableObject
     private readonly ProductService _productService;
     private readonly DeviceService _deviceService;
     private readonly IContentDialogService _dialogService;
+    private readonly INavigationService _navigationService;
+    private readonly ProductDetailsViewModel _detailsViewModel;
     private readonly SessionManager _session;
     private bool _isInitialized;
 
@@ -22,11 +24,15 @@ public partial class ProductsViewModel : ObservableObject
         ProductService productService,
         DeviceService deviceService,
         IContentDialogService dialogService,
+        INavigationService navigationService,
+        ProductDetailsViewModel detailsViewModel,
         SessionManager session)
     {
         _productService = productService;
         _deviceService = deviceService;
         _dialogService = dialogService;
+        _navigationService = navigationService;
+        _detailsViewModel = detailsViewModel;
         _session = session;
     }
 
@@ -93,10 +99,12 @@ public partial class ProductsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OnSelectProduct(ProductItemViewModel product)
+    private async Task OnSelectProduct(ProductItemViewModel product)
     {
         if (product == null) return;
-        // Navigation to Product Details with Tabs
+        
+        await _detailsViewModel.InitializeAsync(product.Record.id);
+        _navigationService.Navigate(typeof(Poplar.Views.Pages.Manufacturing.ProductDetailsPage));
     }
 }
 

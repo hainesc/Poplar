@@ -73,4 +73,17 @@ public sealed class ProductService
         await EnsureInitialized();
         await _backend.ProductVm.UpdateTraceabilitySchema(productId, items);
     }
+
+    // Process Flow (DAG)
+    public async Task<DagFlow?> GetDagByProductAsync(int productId)
+    {
+        await EnsureInitialized();
+        return await _backend.ProductVm.GetDagByProduct(productId);
+    }
+
+    public async Task UpdateDagByProductAsync(int productId, DagFlow dag)
+    {
+        await EnsureInitialized();
+        await _backend.ProductVm.UpdateDagByProduct(productId, dag);
+    }
 }
