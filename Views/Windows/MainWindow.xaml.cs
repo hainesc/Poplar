@@ -48,7 +48,7 @@ public partial class MainWindow : IWindow
         // Sync initial state after the window is fully loaded to avoid binding/null issues
         Dispatcher.BeginInvoke(() =>
         {
-            UpdateNavigationForAuthState(_session.IsAuthenticated);
+            UpdateNavigationForAuthState(_session.IsAuthenticated, _session.WorkspaceId);
         }, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 
@@ -157,15 +157,17 @@ public partial class MainWindow : IWindow
 
     private void OnSessionPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(SessionManager.IsAuthenticated)) return;
-
-        Dispatcher.Invoke(() =>
+        if (e.PropertyName == nameof(SessionManager.IsAuthenticated) || 
+            e.PropertyName == nameof(SessionManager.WorkspaceId))
         {
-            UpdateNavigationForAuthState(_session.IsAuthenticated);
-        });
+            Dispatcher.Invoke(() =>
+            {
+                UpdateNavigationForAuthState(_session.IsAuthenticated, _session.WorkspaceId);
+            });
+        }
     }
 
-    private void UpdateNavigationForAuthState(bool isAuthenticated)
+    private void UpdateNavigationForAuthState(bool isAuthenticated, int workspaceId)
     {
         if (!_isInitialized || NavigationView == null || AuthFrame == null)
         {
@@ -174,19 +176,33 @@ public partial class MainWindow : IWindow
 
         if (isAuthenticated)
         {
-            NavigationView.Visibility = Visibility.Visible;
-            AuthFrame.Visibility = Visibility.Collapsed;
-            AuthFrame.Content = null; // Clear login page from memory
+            if (workspaceId > 0)
+            {
+                // Full access
+                NavigationView.Visibility = Visibility.Visible;
+                AuthFrame.Visibility = Visibility.Collapsed;
+                AuthFrame.Content = null;
 
-            // Navigate main area to dashboard
-            NavigateToPage(typeof(DashboardPage));
+                NavigateToPage(typeof(DashboardPage));
+            }
+            else
+            {
+                // Authenticated but no workspace - show workspace setup
+                NavigationView.Visibility = Visibility.Collapsed;
+                AuthFrame.Visibility = Visibility.Visible;
+                
+                if (AuthFrame.Content?.GetType() != typeof(Poplar.Views.Pages.Workspaces.WorkspacesPage))
+                {
+                    AuthFrame.Navigate(_serviceProvider.GetRequiredService<Poplar.Views.Pages.Workspaces.WorkspacesPage>());
+                }
+            }
         }
         else
         {
+            // Not authenticated - show login
             NavigationView.Visibility = Visibility.Collapsed;
             AuthFrame.Visibility = Visibility.Visible;
 
-            // Navigate AuthFrame to login page
             if (AuthFrame.Content?.GetType() != typeof(LoginPage))
             {
                 AuthFrame.Navigate(_serviceProvider.GetRequiredService<LoginPage>());

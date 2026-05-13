@@ -151,6 +151,8 @@
                                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                             <ui:Button
                                                 Padding="4"
+                                                Command="{Binding DataContext.ViewModel.EditDeviceCommand, RelativeSource={RelativeSource AncestorType=local:DevicesPage}}"
+                                                CommandParameter="{Binding}"
                                                 Icon="{ui:SymbolIcon Edit24}"
                                                 Appearance="Transparent" />
                                             <ui:Button
@@ -179,6 +181,7 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
             Appearance="Primary"
+            Command="{Binding ViewModel.AddDeviceCommand}"
             CornerRadius="28"
             Icon="{ui:SymbolIcon Add24}" />
     </Grid>

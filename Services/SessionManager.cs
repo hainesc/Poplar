@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using uniffi.stump;
 
 namespace Poplar.Services;
@@ -27,9 +28,56 @@ public sealed partial class SessionManager : ObservableObject, IDisposable
     [ObservableProperty]
     private AuthToken? _currentToken;
 
+    [ObservableProperty]
+    private int _workspaceId;
+
+    [ObservableProperty]
+    private string? _workspaceMode;
+
     public SessionManager(BackendService backend)
     {
         _backend = backend;
+    }
+
+    private void DecodeJwtAndSetWorkspace(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2) return;
+
+            var payload = parts[1];
+            // Base64Url to Base64
+            payload = payload.Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2: payload += "=="; break;
+                case 3: payload += "="; break;
+            }
+
+            var jsonBytes = Convert.FromBase64String(payload);
+            using var doc = JsonDocument.Parse(jsonBytes);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("workspace_id", out var idProp))
+            {
+                WorkspaceId = idProp.GetInt32();
+            }
+            else
+            {
+                WorkspaceId = 0;
+            }
+
+            if (root.TryGetProperty("workspace_mode", out var modeProp))
+            {
+                WorkspaceMode = modeProp.GetString();
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.WriteLine($"[Session] Failed to parse JWT for workspace: {ex.Message}");
+            WorkspaceId = 0;
+        }
     }
 
     /// <summary>
@@ -199,6 +247,7 @@ public sealed partial class SessionManager : ObservableObject, IDisposable
                 CurrentUser = user;
                 CurrentToken = token;
                 _tokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(token.expiresIn);
+                DecodeJwtAndSetWorkspace(token.accessToken);
                 PersistRefreshToken(token.refreshToken);
             });
 
@@ -217,11 +266,27 @@ public sealed partial class SessionManager : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Updates the session with a new token (e.g. after workspace creation).
+    /// </summary>
+    public void UpdateToken(AuthToken token)
+    {
+        CurrentToken = token;
+        _tokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(token.expiresIn);
+        DecodeJwtAndSetWorkspace(token.accessToken);
+        PersistRefreshToken(token.refreshToken);
+        
+        // Notify changes
+        OnPropertyChanged(nameof(CurrentToken));
+        OnPropertyChanged(nameof(WorkspaceId));
+    }
+
     private void SetSession(UserRecord user, AuthToken token)
     {
         CurrentUser = user;
         CurrentToken = token;
         _tokenExpiresAt = DateTimeOffset.UtcNow.AddSeconds(token.expiresIn);
+        DecodeJwtAndSetWorkspace(token.accessToken);
         IsAuthenticated = true;
     }
 
@@ -230,6 +295,8 @@ public sealed partial class SessionManager : ObservableObject, IDisposable
         CurrentUser = null;
         CurrentToken = null;
         _tokenExpiresAt = DateTimeOffset.MinValue;
+        WorkspaceId = 0;
+        WorkspaceMode = null;
         IsAuthenticated = false;
     }
 

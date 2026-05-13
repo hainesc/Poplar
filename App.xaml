@@ -34,6 +34,7 @@
             <helpers:BoolToToggleActionConverter x:Key="BoolToToggleAction" />
             <helpers:NullToFalseConverter x:Key="NullToFalseConverter" />
             <converters:StringToUppercaseConverter x:Key="StringToUppercaseConverter" />
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

@@ -1,0 +1,127 @@
+<Page
+    x:Class="Poplar.Views.Pages.Workspaces.WorkspacesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Poplar.Views.Pages.Workspaces"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Initialize Workspace"
+    d:DataContext="{d:DesignInstance local:WorkspacesPage, IsDesignTimeCreatable=False}"
+    d:DesignHeight="600"
+    d:DesignWidth="1000"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- Background Layer -->
+        <Border Background="{DynamicResource ApplicationBackgroundBrush}">
+            <Grid>
+                <ui:Image
+                    Margin="-100"
+                    Opacity="0.4"
+                    Source="pack://application:,,,/Assets/pexels-johannes-plenio-1103970.jpg"
+                    Stretch="UniformToFill">
+                    <ui:Image.Effect>
+                        <BlurEffect Radius="80" />
+                    </ui:Image.Effect>
+                </ui:Image>
+                <Border Background="#40000000" />
+            </Grid>
+        </Border>
+
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Orientation="Vertical">
+
+            <ui:SymbolIcon
+                Margin="0,0,0,24"
+                FontSize="64"
+                Foreground="White"
+                Symbol="Factory24" />
+
+            <ui:TextBlock
+                Margin="0,0,0,8"
+                HorizontalAlignment="Center"
+                FontSize="32"
+                FontWeight="Bold"
+                Foreground="White"
+                Text="Welcome to Poplar" />
+
+            <ui:TextBlock
+                Margin="0,0,0,40"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Foreground="#CCFFFFFF"
+                Text="Let's set up your manufacturing workspace to get started." />
+
+            <ui:Card
+                Width="400"
+                Padding="32"
+                VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock
+                        Margin="0,0,0,24"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Create New Workspace" />
+
+                    <ui:TextBox
+                        Margin="0,0,0,16"
+                        Icon="Edit24"
+                        PlaceholderText="Workspace Name (e.g. Shanghai Plant #1)"
+                        Text="{Binding ViewModel.WorkspaceName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock
+                        Margin="4,0,0,8"
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Text="Operation Mode" />
+
+                    <ComboBox
+                        Margin="0,0,0,24"
+                        HorizontalAlignment="Stretch"
+                        SelectedValue="{Binding ViewModel.WorkspaceMode, Mode=TwoWay}"
+                        SelectedValuePath="Tag">
+                        <ComboBoxItem Content="Discrete Manufacturing" Tag="discrete" />
+                        <ComboBoxItem Content="Process Manufacturing" Tag="process" />
+                    </ComboBox>
+
+                    <ui:Button
+                        Height="40"
+                        HorizontalAlignment="Stretch"
+                        Appearance="Primary"
+                        Command="{Binding ViewModel.CreateWorkspaceCommand}"
+                        Content="Create &amp; Initialize" />
+
+                    <ui:TextBlock
+                        Margin="0,12,0,0"
+                        HorizontalAlignment="Center"
+                        Foreground="Red"
+                        Text="{Binding ViewModel.ErrorMessage}"
+                        Visibility="{Binding ViewModel.ErrorMessage, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=!null|empty}" />
+                </StackPanel>
+            </ui:Card>
+
+            <ui:Button
+                Margin="0,24,0,0"
+                HorizontalAlignment="Center"
+                Appearance="Transparent"
+                Content="Already have an invite? Join Workspace"
+                Foreground="White" />
+        </StackPanel>
+
+        <!-- Loading Overlay -->
+        <Border
+            Background="#A0000000"
+            Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock
+                    Margin="0,16,0,0"
+                    Foreground="White"
+                    Text="Initializing Workspace..." />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
