@@ -13,6 +13,7 @@ public partial class DevicesViewModel : ObservableObject, IRecipient<DeviceStatu
     private readonly DeviceService _deviceService;
     private readonly IContentDialogService _dialogService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly SessionManager _session;
     private bool _isInitialized;
 
     [ObservableProperty]
@@ -21,11 +22,13 @@ public partial class DevicesViewModel : ObservableObject, IRecipient<DeviceStatu
     public DevicesViewModel(
         DeviceService deviceService, 
         IContentDialogService dialogService,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        SessionManager session)
     {
         _deviceService = deviceService;
         _dialogService = dialogService;
         _serviceProvider = serviceProvider;
+        _session = session;
         
         // Register to receive real-time status updates
         WeakReferenceMessenger.Default.Register(this);
@@ -102,8 +105,7 @@ public partial class DevicesViewModel : ObservableObject, IRecipient<DeviceStatu
         {
             try
             {
-                // For now use default workspaceId = 1
-                var record = editVm.GetRecord(workspaceId: 1);
+                var record = editVm.GetRecord(workspaceId: _session.WorkspaceId);
                 await _deviceService.AddDeviceAsync(record);
                 
                 // Refresh list
