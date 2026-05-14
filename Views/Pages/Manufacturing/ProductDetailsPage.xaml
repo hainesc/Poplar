@@ -154,23 +154,47 @@
             <TabItem Header="Audit &amp; Traceability">
                 <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     
-                    <DataGrid Grid.Row="0"
+                    <!-- Action Bar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right">
+                        <ui:Button Appearance="Secondary" 
+                                   Content="Add Item" 
+                                   Icon="{ui:SymbolIcon Add24}"
+                                   Command="{Binding ViewModel.AddTraceabilityItemCommand}" />
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
                               ItemsSource="{Binding ViewModel.TraceabilityItems}"
                               AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="True">
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Item Name" Binding="{Binding name}" Width="200" />
-                            <DataGridTextColumn Header="Data Type" Binding="{Binding dataType}" Width="150"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding description}" Width="*" />
+                            <DataGridTextColumn Header="Item Name" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" />
+                            <DataGridTextColumn Header="Data Type" Binding="{Binding DataType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                            
+                            <!-- Delete Column -->
+                            <DataGridTemplateColumn Width="50">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:Button Appearance="Transparent" 
+                                                   Icon="{ui:SymbolIcon Delete24}" 
+                                                   Foreground="{DynamicResource PaletteRedBrush}"
+                                                   Command="{Binding DataContext.ViewModel.DeleteTraceabilityItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                   CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <ui:Button Grid.Row="1" 
+                    <ui:Button Grid.Row="2" 
                                Appearance="Primary" 
                                Content="Save Traceability Schema" 
                                Icon="{ui:SymbolIcon Save24}"

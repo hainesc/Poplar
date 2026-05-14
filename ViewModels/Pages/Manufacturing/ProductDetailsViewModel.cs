@@ -33,7 +33,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
 
     // Traceability Tab
     [ObservableProperty]
-    private ObservableCollection<TraceabilityItem> _traceabilityItems = new();
+    private ObservableCollection<TraceabilityItemViewModel> _traceabilityItems = new();
 
     // Logic Flow Tab (Visual Editor)
     public DagEditorViewModel DagEditor { get; } = new();
@@ -116,7 +116,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
         TraceabilityItems.Clear();
         foreach (var item in items)
         {
-            TraceabilityItems.Add(item);
+            TraceabilityItems.Add(new TraceabilityItemViewModel(item));
         }
     }
 
@@ -257,13 +257,32 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            var itemsArray = TraceabilityItems.ToArray();
+            var itemsArray = TraceabilityItems.Select(t => t.ToRecord()).ToArray();
             await _productService.UpdateTraceabilitySchemaAsync(_productId, itemsArray);
             ShowSuccess("Traceability Schema Saved");
         }
         catch (System.Exception ex)
         {
             ShowError("Save Failed", ex.Message);
+        }
+    }
+
+    [RelayCommand]
+    private void AddTraceabilityItem()
+    {
+        TraceabilityItems.Add(new TraceabilityItemViewModel
+        {
+            DataType = "string",
+            ProductId = _productId
+        });
+    }
+
+    [RelayCommand]
+    private void DeleteTraceabilityItem(TraceabilityItemViewModel item)
+    {
+        if (item != null && TraceabilityItems.Contains(item))
+        {
+            TraceabilityItems.Remove(item);
         }
     }
 
