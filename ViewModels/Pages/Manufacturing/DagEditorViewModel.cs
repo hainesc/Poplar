@@ -179,11 +179,16 @@ public partial class DagEditorViewModel : ObservableObject
     [RelayCommand]
     private void CreateConnection(object? parameter)
     {
-        // Nodify passes the Source and Target connectors' DataContext
-        if (parameter is object[] args && args.Length >= 2)
+        if (parameter == null) return;
+        
+        try
         {
-            var source = args[0] as FlowNodeViewModel;
-            var target = args[1] as FlowNodeViewModel;
+            dynamic args = parameter;
+            object sourceObj = args.Source;
+            object targetObj = args.Target;
+
+            var source = sourceObj as FlowNodeViewModel;
+            var target = targetObj as FlowNodeViewModel;
 
             if (source != null && target != null && source != target)
             {
@@ -192,6 +197,14 @@ public partial class DagEditorViewModel : ObservableObject
                     Connections.Add(new FlowConnectionViewModel(source, target, new EdgeCondition.Fallback()));
                 }
             }
+            else
+            {
+                System.Windows.MessageBox.Show($"[Debug] CreateConnection Failed.\nSource: {sourceObj?.GetType().Name}\nTarget: {targetObj?.GetType().Name}");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            System.Windows.MessageBox.Show($"[Debug] CreateConnection Exception:\n{ex.Message}");
         }
     }
 

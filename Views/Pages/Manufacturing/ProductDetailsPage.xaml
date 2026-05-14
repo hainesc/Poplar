@@ -266,8 +266,7 @@
                                 </nodify:NodifyEditor.InputBindings>
 
                                 <nodify:NodifyEditor.PendingConnection>
-                                    <nodify:PendingConnection IsVisible="{Binding IsConnecting}"
-                                                              Source="{Binding PendingConnectionSource}" />
+                                    <nodify:PendingConnection CompletedCommand="{Binding CreateConnectionCommand}" />
                                 </nodify:NodifyEditor.PendingConnection>
                                 
                                 <nodify:NodifyEditor.Resources>
@@ -304,9 +303,11 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <nodify:NodeInput Grid.Column="0" Header="In" IsConnected="True" 
+                                                                  DataContext="{Binding}"
                                                                   Anchor="{Binding InputAnchor, Mode=OneWayToSource}" />
                                                 <TextBlock Grid.Column="1" Text="{Binding Id}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10" Opacity="0.5" />
                                                 <nodify:NodeOutput Grid.Column="2" Header="Out" IsConnected="True" 
+                                                                   DataContext="{Binding}"
                                                                    Anchor="{Binding OutputAnchor, Mode=OneWayToSource}" />
                                             </Grid>
                                         </nodify:Node>
