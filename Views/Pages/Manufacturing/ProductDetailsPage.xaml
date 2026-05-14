@@ -93,7 +93,7 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right">
                         <ui:Button Appearance="Secondary" 
                                    Content="Bulk Import" 
-                                   Icon="{ui:SymbolIcon DocumentArrowUp24}"
+                                   Icon="{ui:SymbolIcon DocumentAdd24}"
                                    Command="{Binding ViewModel.BulkImportTagsCommand}" 
                                    Margin="0,0,8,0" />
                         <ui:Button Appearance="Secondary" 
