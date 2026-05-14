@@ -10,6 +10,7 @@ namespace Poplar.ViewModels.Pages.Manufacturing;
 
 public partial class ProductDetailsViewModel : ObservableObject, INavigationAware
 {
+    private readonly INavigationService _navigationService;
     private readonly ProductService _productService;
     private readonly DeviceService _deviceService;
     private readonly ISnackbarService _snackbarService;
@@ -44,15 +45,23 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     private DagFlow? _originalDag;
 
     public ProductDetailsViewModel(
+        INavigationService navigationService,
         ProductService productService,
         DeviceService deviceService,
         ISnackbarService snackbarService,
         IContentDialogService dialogService)
     {
+        _navigationService = navigationService;
         _productService = productService;
         _deviceService = deviceService;
         _snackbarService = snackbarService;
         _dialogService = dialogService;
+    }
+
+    [RelayCommand]
+    private void OnNavigateBack()
+    {
+        _navigationService.GoBack();
     }
 
     public async Task InitializeAsync(int productId)

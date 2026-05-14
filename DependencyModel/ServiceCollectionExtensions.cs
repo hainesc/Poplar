@@ -17,24 +17,34 @@ internal static class ServiceCollectionExtensions
     {
         foreach (Assembly assembly in assemblies)
         {
-            IEnumerable<Type> types = assembly
-                .GetTypes()
-                .Where(x =>
-                    x.IsClass
-                    && x.Namespace!.StartsWith(namespaceName, StringComparison.InvariantCultureIgnoreCase)
-                );
-
-            foreach (Type? type in types)
+            try
             {
-                if (services.All(x => x.ServiceType != type))
-                {
-                    if (type == typeof(ViewModel))
-                    {
-                        continue;
-                    }
+                var types = assembly
+                    .GetTypes()
+                    .Where(x =>
+                        x.IsClass
+                        && !x.IsAbstract
+                        && x.Namespace != null
+                        && x.Namespace.StartsWith(namespaceName, StringComparison.InvariantCultureIgnoreCase)
+                        && (x.Name.EndsWith("Page") || x.Name.EndsWith("ViewModel"))
+                    );
 
-                    _ = services.AddTransient(type);
+                foreach (Type type in types)
+                {
+                    if (services.All(x => x.ServiceType != type))
+                    {
+                        if (type == typeof(ViewModel))
+                        {
+                            continue;
+                        }
+
+                        _ = services.AddTransient(type);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DependencyInjection] Failed to load types from {assembly.FullName}: {ex.Message}");
             }
         }
 

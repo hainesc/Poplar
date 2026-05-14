@@ -13,7 +13,7 @@ internal static class AppPaths
     /// Root data directory: %LocalAppData%/Poplar
     /// </summary>
     public static string DataDirectory { get; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) ?? AppContext.BaseDirectory,
         "Poplar"
     );
 

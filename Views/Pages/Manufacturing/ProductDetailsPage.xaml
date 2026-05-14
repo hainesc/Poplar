@@ -351,16 +351,16 @@
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
-                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight16" Margin="4,0" />
+                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight24" Margin="4,0" />
                                                     <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Context Key" FontSize="10" />
-                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent" 
+                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss24}" Appearance="Transparent" 
                                                                Command="{Binding DataContext.DeleteOutputMappingCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                                CommandParameter="{Binding}" Margin="4,0,0,0" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                    <ui:Button Content="Add Output Mapping" Icon="{ui:SymbolIcon Add16}" Command="{Binding AddOutputMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                                    <ui:Button Content="Add Output Mapping" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddOutputMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
 
                                     <TextBlock Text="TRACEABILITY MAPPINGS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,16,0,8" />
                                     <ItemsControl ItemsSource="{Binding OutputToTrace}">
@@ -374,16 +374,16 @@
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
                                                     <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
-                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight16" Margin="4,0" />
+                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight24" Margin="4,0" />
                                                     <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Trace Field" FontSize="10" />
-                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent" 
+                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss24}" Appearance="Transparent" 
                                                                Command="{Binding DataContext.DeleteTraceMappingCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                                CommandParameter="{Binding}" Margin="4,0,0,0" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
-                                    <ui:Button Content="Add Trace Mapping" Icon="{ui:SymbolIcon Add16}" Command="{Binding AddTraceMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                                    <ui:Button Content="Add Trace Mapping" Icon="{ui:SymbolIcon Add24}" Command="{Binding AddTraceMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
                                     
                                     <Separator Margin="0,16" />
                                     <TextBlock Text="RETRY POLICY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
