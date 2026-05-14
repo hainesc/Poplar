@@ -19,6 +19,10 @@ public partial class DagEditorViewModel : ObservableObject
     [ObservableProperty] private FlowNodeViewModel? _selectedNode;
     [ObservableProperty] private FlowConnectionViewModel? _selectedConnection;
 
+    // For manual connections
+    public Point PendingConnectionSource { get; set; }
+    public bool IsConnecting { get; set; }
+
     public void Initialize(StepMetadata[] metadata)
     {
         _stepMetadata = metadata;
@@ -150,6 +154,32 @@ public partial class DagEditorViewModel : ObservableObject
         {
             Connections.Remove(SelectedConnection);
             SelectedConnection = null;
+        }
+    }
+
+    [RelayCommand]
+    private void DisconnectConnector(FlowNodeViewModel node)
+    {
+        var toRemove = Connections.Where(c => c.Source == node || c.Target == node).ToList();
+        foreach (var c in toRemove) Connections.Remove(c);
+    }
+
+    [RelayCommand]
+    private void CreateConnection(object? parameter)
+    {
+        // Nodify passes the Source and Target connectors' DataContext
+        if (parameter is object[] args && args.Length >= 2)
+        {
+            var source = args[0] as FlowNodeViewModel;
+            var target = args[1] as FlowNodeViewModel;
+
+            if (source != null && target != null && source != target)
+            {
+                if (!Connections.Any(c => c.Source == source && c.Target == target))
+                {
+                    Connections.Add(new FlowConnectionViewModel(source, target, EdgeCondition.Success));
+                }
+            }
         }
     }
 

@@ -14,6 +14,8 @@ public partial class FlowNodeViewModel : ObservableObject
     [ObservableProperty] private string _displayName = string.Empty;
     [ObservableProperty] private bool _isEntry;
     [ObservableProperty] private Point _location;
+    [ObservableProperty] private Point _inputAnchor;
+    [ObservableProperty] private Point _outputAnchor;
 
     // Rich collections for editing
     public ObservableCollection<StepParamViewModel> Parameters { get; } = new();

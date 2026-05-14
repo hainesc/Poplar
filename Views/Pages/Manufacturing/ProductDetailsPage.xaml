@@ -254,9 +254,18 @@
                                 ItemsSource="{Binding Nodes}"
                                 Connections="{Binding Connections}"
                                 SelectedItems="{Binding SelectedNode}"
+                                DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
+                                ConnectionCompletedCommand="{Binding CreateConnectionCommand}"
                                 AllowDrop="True"
                                 Drop="OnNodifyEditorDrop"
                                 Background="Transparent">
+                                
+                                <nodify:NodifyEditor.Resources>
+                                    <Style TargetType="{x:Type nodify:PendingConnection}">
+                                        <Setter Property="Stroke" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                        <Setter Property="StrokeDashArray" Value="2 2" />
+                                    </Style>
+                                </nodify:NodifyEditor.Resources>
                                 
                                 <nodify:NodifyEditor.ItemContainerStyle>
                                     <Style TargetType="{x:Type nodify:ItemContainer}">
@@ -284,9 +293,11 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <nodify:NodeInput Grid.Column="0" Header="In" IsConnected="True" />
+                                                <nodify:NodeInput Grid.Column="0" Header="In" IsConnected="True" 
+                                                                  Anchor="{Binding InputAnchor, Mode=OneWayToSource}" />
                                                 <TextBlock Grid.Column="1" Text="{Binding Id}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10" Opacity="0.5" />
-                                                <nodify:NodeOutput Grid.Column="2" Header="Out" IsConnected="True" />
+                                                <nodify:NodeOutput Grid.Column="2" Header="Out" IsConnected="True" 
+                                                                   Anchor="{Binding OutputAnchor, Mode=OneWayToSource}" />
                                             </Grid>
                                         </nodify:Node>
                                     </DataTemplate>
@@ -294,8 +305,8 @@
 
                                 <nodify:NodifyEditor.ConnectionTemplate>
                                     <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
-                                        <nodify:Connection Source="{Binding Source.Location}"
-                                                           Target="{Binding Target.Location}" />
+                                        <nodify:Connection Source="{Binding Source.OutputAnchor}"
+                                                           Target="{Binding Target.InputAnchor}" />
                                     </DataTemplate>
                                 </nodify:NodifyEditor.ConnectionTemplate>
                             </nodify:NodifyEditor>
