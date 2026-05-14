@@ -16,6 +16,9 @@ public partial class PlcTagViewModel : ObservableObject
     [ObservableProperty] private long _createdAt;
     [ObservableProperty] private int _workspaceId;
 
+    public string FormattedAddress => BitOffset > 0 ? $"{ByteOffset}.{BitOffset}" : $"{ByteOffset}";
+    public string DisplayString => $"{Name} ({FormattedAddress})";
+
     public PlcTagViewModel() { }
 
     public PlcTagViewModel(PlcTagRecord record)

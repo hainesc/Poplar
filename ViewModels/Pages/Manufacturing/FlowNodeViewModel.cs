@@ -122,6 +122,8 @@ public partial class FlowNodeViewModel : ObservableObject
 public partial class StepParamViewModel : ObservableObject
 {
     public string Name { get; }
+    public string DataType { get; }
+    public string ParamType { get; }
     public string Type { get; }
     public string Description { get; }
 
@@ -138,7 +140,9 @@ public partial class StepParamViewModel : ObservableObject
     public StepParamViewModel(ParamInfo info)
     {
         Name = info.name;
-        Type = info.paramType.ToString();
+        DataType = info.dataType;
+        ParamType = info.paramType.ToString();
+        Type = info.paramType.ToString(); // Backwards compatibility for GenericValueHelper wrap
         Description = info.description;
     }
 }
@@ -214,12 +218,50 @@ public partial class FlowConnectionViewModel : ObservableObject
 {
     [ObservableProperty] private FlowNodeViewModel? _source;
     [ObservableProperty] private FlowNodeViewModel? _target;
-    [ObservableProperty] private EdgeCondition _condition;
+    
+    // UI Properties for Edge Condition
+    [ObservableProperty] private string _conditionType = "Fallback";
+    
+    [ObservableProperty] private int _statusValue = 200;
+    
+    [ObservableProperty] private string _variableKey = string.Empty;
+    [ObservableProperty] private string _variableOperator = "==";
+    [ObservableProperty] private string _variableExpectedValue = "0";
 
     public FlowConnectionViewModel(FlowNodeViewModel source, FlowNodeViewModel target, EdgeCondition condition)
     {
         Source = source;
         Target = target;
-        Condition = condition;
+        InitializeFromCondition(condition);
+    }
+    
+    private void InitializeFromCondition(EdgeCondition condition)
+    {
+        if (condition is EdgeCondition.Status status)
+        {
+            ConditionType = "Status";
+            StatusValue = status.v1;
+        }
+        else if (condition is EdgeCondition.Variable variable)
+        {
+            ConditionType = "Variable";
+            VariableKey = variable.key;
+            VariableOperator = variable.@operator;
+            VariableExpectedValue = GenericValueHelper.Unwrap(variable.expected)?.ToString() ?? "0";
+        }
+        else
+        {
+            ConditionType = "Fallback";
+        }
+    }
+
+    public EdgeCondition ToEdgeCondition()
+    {
+        return ConditionType switch
+        {
+            "Status" => new EdgeCondition.Status(StatusValue),
+            "Variable" => new EdgeCondition.Variable(VariableKey, VariableOperator, GenericValueHelper.Wrap(VariableExpectedValue, "int")),
+            _ => new EdgeCondition.Fallback()
+        };
     }
 }

@@ -228,7 +228,7 @@ public partial class DagEditorViewModel : ObservableObject
         {
             var nodeRecord = nodeVm.ToRecord();
             var outgoingConnections = Connections.Where(c => c.Source?.Id == nodeVm.Id).ToList();
-            var edges = outgoingConnections.Select(c => new DagEdge(c.Target!.Id, c.Condition)).ToArray();
+            var edges = outgoingConnections.Select(c => new DagEdge(c.Target!.Id, c.ToEdgeCondition())).ToArray();
             
             // Create updated record with edges
             var updatedNode = new DagNode(

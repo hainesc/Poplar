@@ -332,9 +332,10 @@
                     <!-- 3. Property Panel -->
                     <Border Grid.Column="2" Margin="12,0,0,0" Padding="16" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
                         <Grid>
-                            <TextBlock Text="Select a node to configure" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" 
-                                       Visibility="{Binding ViewModel.DagEditor.SelectedNode, Converter={StaticResource NullToVisibilityConverter}}" />
+                            <TextBlock Text="Select a node or connection to configure" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" 
+                                       Visibility="{Binding ViewModel.DagEditor.SelectedItem, Converter={StaticResource NullToVisibilityConverter}}" />
                             
+                            <!-- Node Properties -->
                             <ScrollViewer Visibility="{Binding ViewModel.DagEditor.SelectedNode, Converter={StaticResource NotNullToVisibilityConverter}}">
                                 <StackPanel DataContext="{Binding ViewModel.DagEditor.SelectedNode}">
                                     <TextBlock Text="{Binding StepType}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PaletteGoldBrush}" />
@@ -357,8 +358,54 @@
                                                     <ui:TextBox Visibility="{Binding IsMapped, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                                                 Text="{Binding MappingKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="VARIABLE_NAME" />
                                                     
-                                                    <ui:TextBox Visibility="{Binding IsMapped, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                                                Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Description}" />
+                                                    <ContentControl Content="{Binding}" Visibility="{Binding IsMapped, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                                                        <ContentControl.Style>
+                                                            <Style TargetType="ContentControl">
+                                                                <Setter Property="ContentTemplate">
+                                                                    <Setter.Value>
+                                                                        <DataTemplate>
+                                                                            <ui:TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Description}" />
+                                                                        </DataTemplate>
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ParamType}" Value="DeviceName">
+                                                                        <Setter Property="ContentTemplate">
+                                                                            <Setter.Value>
+                                                                                <DataTemplate>
+                                                                                    <ComboBox ItemsSource="{Binding DataContext.ViewModel.Devices, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                                              SelectedValuePath="Name" DisplayMemberPath="Name"
+                                                                                              SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                              HorizontalAlignment="Stretch" />
+                                                                                </DataTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding ParamType}" Value="PlcAddress">
+                                                                        <Setter Property="ContentTemplate">
+                                                                            <Setter.Value>
+                                                                                <DataTemplate>
+                                                                                    <ComboBox ItemsSource="{Binding DataContext.ViewModel.PlcTags, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                                              SelectedValuePath="FormattedAddress" DisplayMemberPath="DisplayString"
+                                                                                              SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                              HorizontalAlignment="Stretch" />
+                                                                                </DataTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding DataType}" Value="bool">
+                                                                        <Setter Property="ContentTemplate">
+                                                                            <Setter.Value>
+                                                                                <DataTemplate>
+                                                                                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Description}" />
+                                                                                </DataTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </ContentControl.Style>
+                                                    </ContentControl>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -425,6 +472,68 @@
                                             </Grid>
                                         </StackPanel>
                                     </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Connection Properties -->
+                            <ScrollViewer Visibility="{Binding ViewModel.DagEditor.SelectedConnection, Converter={StaticResource NotNullToVisibilityConverter}}">
+                                <StackPanel DataContext="{Binding ViewModel.DagEditor.SelectedConnection}">
+                                    <TextBlock Text="CONNECTION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PaletteGoldBrush}" />
+                                    <TextBlock Text="Transition Condition" FontSize="18" FontWeight="Bold" Margin="0,4,0,16" />
+
+                                    <TextBlock Text="CONDITION TYPE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                    <ComboBox SelectedValue="{Binding ConditionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="0,0,0,16">
+                                        <ComboBoxItem Content="Fallback (Default)" />
+                                        <ComboBoxItem Content="Status" />
+                                        <ComboBoxItem Content="Variable" />
+                                    </ComboBox>
+
+                                    <!-- Status Input -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ConditionType}" Value="Status">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text="EXPECTED STATUS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                        <ui:NumberBox Value="{Binding StatusValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+
+                                    <!-- Variable Input -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ConditionType}" Value="Variable">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        
+                                        <TextBlock Text="VARIABLE KEY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                        <ui:TextBox Text="{Binding VariableKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="e.g. plc_val" Margin="0,0,0,12" />
+
+                                        <TextBlock Text="OPERATOR" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                        <ComboBox SelectedValue="{Binding VariableOperator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="0,0,0,12">
+                                            <ComboBoxItem Content="==" />
+                                            <ComboBoxItem Content="!=" />
+                                            <ComboBoxItem Content="&gt;" />
+                                            <ComboBoxItem Content="&lt;" />
+                                            <ComboBoxItem Content="&gt;=" />
+                                            <ComboBoxItem Content="&lt;=" />
+                                            <ComboBoxItem Content="in_range" />
+                                        </ComboBox>
+
+                                        <TextBlock Text="EXPECTED VALUE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                        <ui:TextBox Text="{Binding VariableExpectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Value" />
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
