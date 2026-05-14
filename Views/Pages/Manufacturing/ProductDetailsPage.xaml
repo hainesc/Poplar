@@ -374,7 +374,7 @@
                                                                             <Setter.Value>
                                                                                 <DataTemplate>
                                                                                     <ComboBox ItemsSource="{Binding DataContext.ViewModel.Devices, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                                                              SelectedValuePath="Name" DisplayMemberPath="Name"
+                                                                                              SelectedValuePath="name" DisplayMemberPath="name"
                                                                                               SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                                                               HorizontalAlignment="Stretch" />
                                                                                 </DataTemplate>
@@ -482,10 +482,12 @@
                                     <TextBlock Text="Transition Condition" FontSize="18" FontWeight="Bold" Margin="0,4,0,16" />
 
                                     <TextBlock Text="CONDITION TYPE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
-                                    <ComboBox SelectedValue="{Binding ConditionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="0,0,0,16">
-                                        <ComboBoxItem Content="Fallback (Default)" />
-                                        <ComboBoxItem Content="Status" />
-                                        <ComboBoxItem Content="Variable" />
+                                    <ComboBox SelectedValue="{Binding ConditionType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                              SelectedValuePath="Tag"
+                                              HorizontalAlignment="Stretch" Margin="0,0,0,16">
+                                        <ComboBoxItem Content="Fallback (Default)" Tag="Fallback" />
+                                        <ComboBoxItem Content="Status" Tag="Status" />
+                                        <ComboBoxItem Content="Variable" Tag="Variable" />
                                     </ComboBox>
 
                                     <!-- Status Input -->
@@ -521,7 +523,9 @@
                                         <ui:TextBox Text="{Binding VariableKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="e.g. plc_val" Margin="0,0,0,12" />
 
                                         <TextBlock Text="OPERATOR" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
-                                        <ComboBox SelectedValue="{Binding VariableOperator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" Margin="0,0,0,12">
+                                        <ComboBox SelectedValue="{Binding VariableOperator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                  SelectedValuePath="Content"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,0,12">
                                             <ComboBoxItem Content="==" />
                                             <ComboBoxItem Content="!=" />
                                             <ComboBoxItem Content="&gt;" />
