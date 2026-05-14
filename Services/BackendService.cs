@@ -12,6 +12,7 @@ public sealed class BackendService : IDisposable
     private RbacViewModel? _rbacVm;
     private DeviceViewModel? _deviceVm;
     private ProductViewModel? _productVm;
+    private ManufacturingViewModel? _manufacturingVm;
     private bool _isInitialized;
     private readonly SemaphoreSlim _initLock = new(1, 1);
 
@@ -39,6 +40,12 @@ public sealed class BackendService : IDisposable
         ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
 
     /// <summary>
+    /// The Manufacturing ViewModel for process execution operations.
+    /// </summary>
+    public ManufacturingViewModel ManufacturingVm => _manufacturingVm
+        ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
+
+    /// <summary>
     /// The raw Launcher instance for accessing other ViewModels if needed.
     /// </summary>
     public Launcher Launcher => _launcher
@@ -62,6 +69,7 @@ public sealed class BackendService : IDisposable
             _rbacVm = _launcher.RbacVm();
             _deviceVm = _launcher.DeviceManager();
             _productVm = _launcher.ProductVm();
+            _manufacturingVm = _launcher.ManufacturingVm();
 
             _isInitialized = true;
             Debug.WriteLine("[Backend] Initialized successfully.");

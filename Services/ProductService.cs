@@ -86,4 +86,10 @@ public sealed class ProductService
         await EnsureInitialized();
         await _backend.ProductVm.UpdateDagByProduct(productId, dag);
     }
+
+    public async Task<StepMetadata[]> GetStepTypesAsync()
+    {
+        await EnsureInitialized();
+        return await Task.Run(() => _backend.ManufacturingVm.GetStepTypes());
+    }
 }

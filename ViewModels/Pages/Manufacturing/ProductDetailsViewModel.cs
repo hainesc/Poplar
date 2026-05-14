@@ -38,6 +38,9 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     // Logic Flow Tab (Visual Editor)
     public DagEditorViewModel DagEditor { get; } = new();
 
+    [ObservableProperty] private ObservableCollection<DeviceRecord> _devices = new();
+    [ObservableProperty] private PlcTagRecord[] _allTags = Array.Empty<PlcTagRecord>();
+
     private DagFlow? _originalDag;
 
     public ProductDetailsViewModel(
@@ -54,24 +57,20 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
 
     public async Task InitializeAsync(int productId)
     {
-        if (_isInitialized && _productId == productId) return;
         _productId = productId;
+        await LoadProductAsync();
+        await LoadTagsAsync();
+        await LoadTraceabilityAsync();
+        await LoadDevicesAsync();
+        await LoadDagAsync();
+        _isInitialized = true;
+    }
 
-        try
-        {
-            await LoadProductAsync();
-            await LoadHardwareAsync();
-            await LoadTagsAsync();
-            await LoadTraceabilityAsync();
-            await LoadDagAsync();
-
-            _isInitialized = true;
-        }
-        catch (System.Exception ex)
-        {
-            Debug.WriteLine($"[ProductDetailsViewModel] Init failed: {ex.Message}");
-            ShowError("Failed to load product details.", ex.Message);
-        }
+    private async Task LoadDevicesAsync()
+    {
+        var devices = await _deviceService.GetDevicesAsync();
+        Devices.Clear();
+        foreach (var d in devices) Devices.Add(d);
     }
 
     private async Task LoadProductAsync()
@@ -103,6 +102,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     private async Task LoadTagsAsync()
     {
         var tags = await _productService.GetProductTagsAsync(_productId);
+        AllTags = tags;
         PlcTags.Clear();
         foreach (var tag in tags)
         {
@@ -122,8 +122,11 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
 
     private async Task LoadDagAsync()
     {
-        _originalDag = await _productService.GetDagByProductAsync(_productId);
-        DagEditor.LoadFromDagFlow(_originalDag);
+        var meta = await _productService.GetStepTypesAsync();
+        DagEditor.Initialize(meta);
+
+        var dag = await _productService.GetDagByProductAsync(_productId);
+        DagEditor.LoadFromDagFlow(dag);
     }
 
     [RelayCommand]
@@ -291,22 +294,16 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            // Fallback to basic details if original dag is missing (e.g. creating a new one)
-            int dagId = _originalDag?.id ?? 0;
-            string dagName = _originalDag?.name ?? $"{ProductName}_Flow";
-            string entryNode = _originalDag?.entryNode ?? string.Empty;
-
-            var dag = DagEditor.ExportToDagFlow(dagId, dagName, entryNode);
-            
+            var dag = DagEditor.ExportToDagFlow(0, $"Flow for Product {_productId}");
             if (dag != null)
             {
                 await _productService.UpdateDagByProductAsync(_productId, dag);
-                ShowSuccess("Logic Flow Saved");
+                ShowSuccess("Process Logic Saved");
             }
         }
         catch (System.Exception ex)
         {
-            ShowError("Save Failed", "Failed to save logic flow.\n" + ex.Message);
+            ShowError("Save Failed", ex.Message);
         }
     }
 

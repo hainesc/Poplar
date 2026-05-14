@@ -11,11 +11,20 @@
     xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
     xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
     Title="Product Configuration Hub"
-    d:DataContext="{d:DesignInstance local:ProductDetailsPage, IsDesignTimeCreatable=False}"
+    xmlns:helpers="clr-namespace:Poplar.Helpers"
+    d:DataContext="{d:DesignInstance vm:ProductDetailsViewModel, IsDesignTimeCreatable=False}"
     d:DesignHeight="600"
     d:DesignWidth="800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
+        <helpers:BoolToMappingTextConverter x:Key="BoolToMappingTextConverter" />
+    </Page.Resources>
 
     <Grid Margin="24">
         <Grid.RowDefinitions>
@@ -204,58 +213,198 @@
                 </Grid>
             </TabItem>
 
-            <!-- 4. Logic Flow Tab -->
             <TabItem Header="Process Logic (DAG)">
                 <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" /> <!-- Left Palette -->
+                        <ColumnDefinition Width="*" />   <!-- Editor -->
+                        <ColumnDefinition Width="300" /> <!-- Right Panel -->
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Margin="0,0,0,8">
-                        <TextBlock FontSize="14" FontWeight="SemiBold" Text="Visual DAG Editor" />
-                        <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Drag nodes and draw connections to configure process logic." />
-                    </StackPanel>
-
-                    <Border Grid.Row="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4">
-                        <nodify:NodifyEditor 
-                            DataContext="{Binding ViewModel.DagEditor}"
-                            ItemsSource="{Binding Nodes}"
-                            Connections="{Binding Connections}"
-                            Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
-                            
-                            <nodify:NodifyEditor.ItemContainerStyle>
-                                <Style TargetType="{x:Type nodify:ItemContainer}">
-                                    <Setter Property="Location" Value="{Binding Location}" />
-                                </Style>
-                            </nodify:NodifyEditor.ItemContainerStyle>
-
-                            <nodify:NodifyEditor.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:FlowNodeViewModel}">
-                                    <nodify:Node Header="{Binding StepType}"
-                                                 Content="{Binding Id}">
-                                        <nodify:Node.Input>
-                                            <nodify:NodeInput Header="In" IsConnected="True"/>
-                                        </nodify:Node.Input>
-                                        <nodify:Node.Output>
-                                            <nodify:NodeOutput Header="Out" IsConnected="True"/>
-                                        </nodify:Node.Output>
-                                    </nodify:Node>
-                                </DataTemplate>
-                            </nodify:NodifyEditor.ItemTemplate>
-
-                            <nodify:NodifyEditor.ConnectionTemplate>
-                                <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
-                                    <nodify:Connection Source="{Binding Source.Location}"
-                                                       Target="{Binding Target.Location}" />
-                                </DataTemplate>
-                            </nodify:NodifyEditor.ConnectionTemplate>
-
-                        </nodify:NodifyEditor>
+                    <!-- 1. Step Palette -->
+                    <Border Grid.Column="0" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="0,0,1,0" Margin="0,0,12,0">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="PROCESS STEPS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" />
+                            <ListBox ItemsSource="{Binding ViewModel.DagEditor.StepPalette}" Background="Transparent" BorderThickness="0"
+                                     PreviewMouseLeftButtonDown="OnStepPalettePreviewMouseLeftButtonDown">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type stump:StepMetadata}">
+                                        <Border Margin="0,0,0,8" Padding="12" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding stepType}" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock Text="{Binding displayName}" FontWeight="SemiBold" Margin="0,2,0,0" />
+                                                <TextBlock Text="{Binding description}" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
                     </Border>
 
-                    <ui:Button Grid.Row="2" 
+                    <!-- 2. Nodify Editor -->
+                    <Border Grid.Column="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                        <Grid>
+                            <nodify:NodifyEditor 
+                                DataContext="{Binding ViewModel.DagEditor}"
+                                ItemsSource="{Binding Nodes}"
+                                Connections="{Binding Connections}"
+                                SelectedItems="{Binding SelectedNode}"
+                                AllowDrop="True"
+                                Drop="OnNodifyEditorDrop"
+                                Background="Transparent">
+                                
+                                <nodify:NodifyEditor.ItemContainerStyle>
+                                    <Style TargetType="{x:Type nodify:ItemContainer}">
+                                        <Setter Property="Location" Value="{Binding Location}" />
+                                    </Style>
+                                </nodify:NodifyEditor.ItemContainerStyle>
+
+                                <nodify:NodifyEditor.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:FlowNodeViewModel}">
+                                        <nodify:Node Header="{Binding DisplayName}" Content="{Binding Id}">
+                                            <nodify:Node.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Visibility="{Binding DataContext.IsEntry, RelativeSource={RelativeSource AncestorType=nodify:Node}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}" Padding="6,2" CornerRadius="4" Margin="0,0,8,0">
+                                                            <TextBlock Text="START" FontSize="9" FontWeight="Bold" Foreground="White" />
+                                                        </Border>
+                                                        <TextBlock Text="{Binding}" FontWeight="Bold" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </nodify:Node.HeaderTemplate>
+                                            <nodify:Node.Input>
+                                                <nodify:NodeInput Header="In" IsConnected="True"/>
+                                            </nodify:Node.Input>
+                                            <nodify:Node.Output>
+                                                <nodify:NodeOutput Header="Out" IsConnected="True"/>
+                                            </nodify:Node.Output>
+                                        </nodify:Node>
+                                    </DataTemplate>
+                                </nodify:NodifyEditor.ItemTemplate>
+
+                                <nodify:NodifyEditor.ConnectionTemplate>
+                                    <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
+                                        <nodify:Connection Source="{Binding Source.Location}"
+                                                           Target="{Binding Target.Location}" />
+                                    </DataTemplate>
+                                </nodify:NodifyEditor.ConnectionTemplate>
+                            </nodify:NodifyEditor>
+
+                            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Orientation="Horizontal">
+                                <ui:Button Content="Auto Layout" Command="{Binding ViewModel.DagEditor.AutoLayoutCommand}" Appearance="Secondary" Margin="0,0,8,0" />
+                                <ui:Button Icon="{ui:SymbolIcon Delete24}" Command="{Binding ViewModel.DagEditor.DeleteSelectedCommand}" Appearance="Secondary" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 3. Property Panel -->
+                    <Border Grid.Column="2" Margin="12,0,0,0" Padding="16" Background="{DynamicResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <TextBlock Text="Select a node to configure" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" 
+                                       Visibility="{Binding ViewModel.DagEditor.SelectedNode, Converter={StaticResource NullToVisibilityConverter}}" />
+                            
+                            <ScrollViewer Visibility="{Binding ViewModel.DagEditor.SelectedNode, Converter={StaticResource NotNullToVisibilityConverter}}">
+                                <StackPanel DataContext="{Binding ViewModel.DagEditor.SelectedNode}">
+                                    <TextBlock Text="{Binding StepType}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource PaletteGoldBrush}" />
+                                    <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="Bold" Margin="0,4,0,16" />
+
+                                    <CheckBox Content="Set as Entry Node" IsChecked="{Binding IsEntry}" Margin="0,0,0,16" />
+
+                                    <TextBlock Text="INPUT PARAMETERS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                    <ItemsControl ItemsSource="{Binding Parameters}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:StepParamViewModel}">
+                                                <StackPanel Margin="0,0,0,12">
+                                                    <Grid Margin="0,0,0,4">
+                                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold" />
+                                                        <ui:Button Content="{Binding IsMapped, Converter={StaticResource BoolToMappingTextConverter}}" 
+                                                                   HorizontalAlignment="Right" Padding="4,2" FontSize="9"
+                                                                   Command="{Binding ToggleMappingCommand}" />
+                                                    </Grid>
+                                                    
+                                                    <ui:TextBox Visibility="{Binding IsMapped, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                                                                Text="{Binding MappingKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="VARIABLE_NAME" />
+                                                    
+                                                    <ui:TextBox Visibility="{Binding IsMapped, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                                                Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="{Binding Description}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <Separator Margin="0,8" />
+                                    <TextBlock Text="OUTPUT MAPPINGS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                    <ItemsControl ItemsSource="{Binding OutputToContext}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:DataMappingViewModel}">
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
+                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight16" Margin="4,0" />
+                                                    <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Context Key" FontSize="10" />
+                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent" 
+                                                               Command="{Binding DataContext.DeleteOutputMappingCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                               CommandParameter="{Binding}" Margin="4,0,0,0" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ui:Button Content="Add Output Mapping" Icon="{ui:SymbolIcon Add16}" Command="{Binding AddOutputMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
+
+                                    <TextBlock Text="TRACEABILITY MAPPINGS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,16,0,8" />
+                                    <ItemsControl ItemsSource="{Binding OutputToTrace}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:DataMappingViewModel}">
+                                                <Grid Margin="0,0,0,8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
+                                                    <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight16" Margin="4,0" />
+                                                    <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Trace Field" FontSize="10" />
+                                                    <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss16}" Appearance="Transparent" 
+                                                               Command="{Binding DataContext.DeleteTraceMappingCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
+                                                               CommandParameter="{Binding}" Margin="4,0,0,0" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ui:Button Content="Add Trace Mapping" Icon="{ui:SymbolIcon Add16}" Command="{Binding AddTraceMappingCommand}" FontSize="10" HorizontalAlignment="Left" Margin="0,4,0,0" />
+                                    
+                                    <Separator Margin="0,16" />
+                                    <TextBlock Text="RETRY POLICY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
+                                    <Border Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="8" Padding="12">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,8">
+                                                <TextBlock Text="Max Retries" VerticalAlignment="Center" FontSize="11" />
+                                                <ui:NumberBox Value="{Binding RetryPolicy.MaxRetries}" HorizontalAlignment="Right" Width="80" Minimum="0" Maximum="10" />
+                                            </Grid>
+                                            <Grid>
+                                                <TextBlock Text="Interval (ms)" VerticalAlignment="Center" FontSize="11" />
+                                                <ui:NumberBox Value="{Binding RetryPolicy.IntervalMs}" HorizontalAlignment="Right" Width="80" Minimum="100" SpinButtonPlacementMode="Compact" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+
+                    <ui:Button Grid.Row="1" Grid.ColumnSpan="3" 
                                Appearance="Primary" 
                                Content="Save Logic Flow" 
                                Icon="{ui:SymbolIcon Save24}"

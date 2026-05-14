@@ -4,21 +4,34 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using uniffi.stump;
 using System.Linq;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Poplar.ViewModels.Pages.Manufacturing;
 
 public partial class DagEditorViewModel : ObservableObject
 {
-    [ObservableProperty]
-    private ObservableCollection<FlowNodeViewModel> _nodes = new();
+    private StepMetadata[] _stepMetadata = Array.Empty<StepMetadata>();
+    
+    [ObservableProperty] private ObservableCollection<FlowNodeViewModel> _nodes = new();
+    [ObservableProperty] private ObservableCollection<FlowConnectionViewModel> _connections = new();
+    [ObservableProperty] private ObservableCollection<StepMetadata> _stepPalette = new();
+    
+    [ObservableProperty] private FlowNodeViewModel? _selectedNode;
+    [ObservableProperty] private FlowConnectionViewModel? _selectedConnection;
 
-    [ObservableProperty]
-    private ObservableCollection<FlowConnectionViewModel> _connections = new();
+    public void Initialize(StepMetadata[] metadata)
+    {
+        _stepMetadata = metadata;
+        StepPalette.Clear();
+        foreach (var m in metadata) StepPalette.Add(m);
+    }
 
     public void LoadFromDagFlow(DagFlow? dag)
     {
         Nodes.Clear();
         Connections.Clear();
+        SelectedNode = null;
+        SelectedConnection = null;
 
         if (dag == null || dag.nodes == null || dag.nodes.Length == 0)
         {
@@ -29,7 +42,8 @@ public partial class DagEditorViewModel : ObservableObject
         var nodeDict = new Dictionary<string, FlowNodeViewModel>();
         foreach (var record in dag.nodes)
         {
-            var vm = new FlowNodeViewModel(record);
+            var meta = _stepMetadata.FirstOrDefault(m => m.stepType == record.stepType);
+            var vm = new FlowNodeViewModel(record, meta, record.id == dag.entryNode);
             Nodes.Add(vm);
             nodeDict[record.id] = vm;
         }
@@ -52,24 +66,20 @@ public partial class DagEditorViewModel : ObservableObject
         ApplyAutoLayout(dag.entryNode);
     }
 
+    [RelayCommand]
+    private void AutoLayout()
+    {
+        var entryNodeId = Nodes.FirstOrDefault(n => n.IsEntry)?.Id ?? Nodes.FirstOrDefault()?.Id;
+        if (entryNodeId != null) ApplyAutoLayout(entryNodeId);
+    }
+
     private void ApplyAutoLayout(string entryNodeId)
     {
         if (Nodes.Count == 0) return;
 
         var nodeDict = Nodes.ToDictionary(n => n.Id);
-        
-        // Find entry node or just pick the first one
-        FlowNodeViewModel? startNode = null;
-        if (!string.IsNullOrEmpty(entryNodeId) && nodeDict.TryGetValue(entryNodeId, out var found))
-        {
-            startNode = found;
-        }
-        else
-        {
-            startNode = Nodes.First();
-        }
+        FlowNodeViewModel? startNode = nodeDict.TryGetValue(entryNodeId, out var found) ? found : Nodes.First();
 
-        // BFS to assign layers
         var layers = new Dictionary<int, List<FlowNodeViewModel>>();
         var visited = new HashSet<string>();
         var queue = new Queue<(FlowNodeViewModel node, int layer)>();
@@ -80,14 +90,9 @@ public partial class DagEditorViewModel : ObservableObject
         while (queue.Count > 0)
         {
             var (current, layer) = queue.Dequeue();
-
-            if (!layers.ContainsKey(layer))
-            {
-                layers[layer] = new List<FlowNodeViewModel>();
-            }
+            if (!layers.ContainsKey(layer)) layers[layer] = new List<FlowNodeViewModel>();
             layers[layer].Add(current);
 
-            // Find outgoing edges
             var outgoingEdges = Connections.Where(c => c.Source?.Id == current.Id).ToList();
             foreach (var edge in outgoingEdges)
             {
@@ -99,7 +104,6 @@ public partial class DagEditorViewModel : ObservableObject
             }
         }
 
-        // For any disconnected nodes, put them in layer 0 at the bottom
         var disconnected = Nodes.Where(n => !visited.Contains(n.Id)).ToList();
         if (disconnected.Count > 0)
         {
@@ -107,22 +111,12 @@ public partial class DagEditorViewModel : ObservableObject
             layers[0].AddRange(disconnected);
         }
 
-        // Apply coordinates based on layers
-        double startX = 100;
-        double startY = 100;
-        double xSpacing = 350;
-        double ySpacing = 200;
-
+        double startX = 50, startY = 50, xSpacing = 300, ySpacing = 150;
         foreach (var kvp in layers.OrderBy(l => l.Key))
         {
-            int layerIndex = kvp.Key;
-            var nodesInLayer = kvp.Value;
-
-            double currentX = startX + (layerIndex * xSpacing);
+            double currentX = startX + (kvp.Key * xSpacing);
             double currentY = startY;
-
-            // Center vertically if we want, but simple stacking is fine
-            foreach (var node in nodesInLayer)
+            foreach (var node in kvp.Value)
             {
                 node.Location = new Point(currentX, currentY);
                 currentY += ySpacing;
@@ -130,44 +124,62 @@ public partial class DagEditorViewModel : ObservableObject
         }
     }
 
-    public DagFlow? ExportToDagFlow(int originalDagId, string dagName, string entryNode)
+    [RelayCommand]
+    private void AddNode(StepMetadata metadata)
+    {
+        var id = $"node_{DateTime.Now.Ticks}";
+        // Create a dummy record to start with
+        var record = new DagNode(id, metadata.stepType, new Dictionary<string, GenericValue>(), new Dictionary<string, string>(), new DataMapping[0], new DataMapping[0], new DagEdge[0], null);
+        var vm = new FlowNodeViewModel(record, metadata);
+        vm.Location = new Point(100, 100);
+        Nodes.Add(vm);
+        SelectedNode = vm;
+    }
+
+    [RelayCommand]
+    private void DeleteSelected()
+    {
+        if (SelectedNode != null)
+        {
+            var toRemove = Connections.Where(c => c.Source == SelectedNode || c.Target == SelectedNode).ToList();
+            foreach (var c in toRemove) Connections.Remove(c);
+            Nodes.Remove(SelectedNode);
+            SelectedNode = null;
+        }
+        else if (SelectedConnection != null)
+        {
+            Connections.Remove(SelectedConnection);
+            SelectedConnection = null;
+        }
+    }
+
+    public DagFlow? ExportToDagFlow(int originalDagId, string dagName)
     {
         if (Nodes.Count == 0) return null;
 
         var dagNodes = new List<DagNode>();
+        var entryNodeId = Nodes.FirstOrDefault(n => n.IsEntry)?.Id ?? Nodes.First().Id;
 
         foreach (var nodeVm in Nodes)
         {
-            // Reconstruct the node, keeping original params/mappings but updating edges
+            var nodeRecord = nodeVm.ToRecord();
             var outgoingConnections = Connections.Where(c => c.Source?.Id == nodeVm.Id).ToList();
-            var newEdges = new List<DagEdge>();
-
-            foreach (var conn in outgoingConnections)
-            {
-                if (conn.Target != null)
-                {
-                    newEdges.Add(new DagEdge(conn.Target.Id, conn.Condition));
-                }
-            }
-
-            var record = nodeVm.OriginalRecord;
+            var edges = outgoingConnections.Select(c => new DagEdge(c.Target!.Id, c.Condition)).ToArray();
+            
+            // Create updated record with edges
             var updatedNode = new DagNode(
-                record.id,
-                record.stepType,
-                record.staticParams,
-                record.inputMappings,
-                record.outputToContext,
-                record.outputToTrace,
-                newEdges.ToArray(),
-                record.retryPolicy
+                nodeRecord.id,
+                nodeRecord.stepType,
+                nodeRecord.staticParams,
+                nodeRecord.inputMappings,
+                nodeRecord.outputToContext,
+                nodeRecord.outputToTrace,
+                edges,
+                nodeRecord.retryPolicy
             );
-
             dagNodes.Add(updatedNode);
         }
 
-        // If the entry node no longer exists, default to the first node
-        var actualEntryNode = dagNodes.Any(n => n.id == entryNode) ? entryNode : dagNodes.First().id;
-
-        return new DagFlow(originalDagId, dagName, actualEntryNode, dagNodes.ToArray());
+        return new DagFlow(originalDagId, dagName, entryNodeId, dagNodes.ToArray());
     }
 }

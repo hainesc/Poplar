@@ -27,4 +27,33 @@ public partial class ProductDetailsPage : INavigationAware
     {
         return Task.CompletedTask;
     }
+
+    private void OnStepPalettePreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is ListBox listBox && listBox.SelectedItem != null)
+        {
+            DragDrop.DoDragDrop(listBox, listBox.SelectedItem, DragDropEffects.Copy);
+        }
+    }
+
+    private void OnNodifyEditorDrop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(typeof(uniffi.stump.StepMetadata)) is uniffi.stump.StepMetadata meta)
+        {
+            var editor = (Nodify.NodifyEditor)sender;
+            var pos = e.GetPosition(editor);
+            
+            // Call the command on the ViewModel
+            if (ViewModel.DagEditor.AddNodeCommand.CanExecute(meta))
+            {
+                ViewModel.DagEditor.AddNodeCommand.Execute(meta);
+                
+                // Update the location of the newly added node
+                if (ViewModel.DagEditor.Nodes.LastOrDefault() is FlowNodeViewModel newNode)
+                {
+                    newNode.Location = pos;
+                }
+            }
+        }
+    }
 }
