@@ -266,7 +266,7 @@
 
                                 <nodify:NodifyEditor.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:FlowNodeViewModel}">
-                                        <nodify:Node Header="{Binding DisplayName}" Content="{Binding Id}">
+                                        <nodify:Node Header="{Binding DisplayName}">
                                             <nodify:Node.HeaderTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
@@ -278,12 +278,16 @@
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </nodify:Node.HeaderTemplate>
-                                            <nodify:Node.Input>
-                                                <nodify:NodeInput Header="In" IsConnected="True"/>
-                                            </nodify:Node.Input>
-                                            <nodify:Node.Output>
-                                                <nodify:NodeOutput Header="Out" IsConnected="True"/>
-                                            </nodify:Node.Output>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <nodify:NodeInput Grid.Column="0" Header="In" IsConnected="True" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Id}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10" Opacity="0.5" />
+                                                <nodify:NodeOutput Grid.Column="2" Header="Out" IsConnected="True" />
+                                            </Grid>
                                         </nodify:Node>
                                     </DataTemplate>
                                 </nodify:NodifyEditor.ItemTemplate>
