@@ -183,9 +183,22 @@ public partial class DagEditorViewModel : ObservableObject
         
         try
         {
-            dynamic args = parameter;
-            object sourceObj = args.Source;
-            object targetObj = args.Target;
+            object? sourceObj = null;
+            object? targetObj = null;
+
+            // Nodify passes a ValueTuple containing (Source, Target)
+            if (parameter is System.Runtime.CompilerServices.ITuple tuple && tuple.Length >= 2)
+            {
+                sourceObj = tuple[0];
+                targetObj = tuple[1];
+            }
+            else
+            {
+                // Fallback for other potential payload structures
+                dynamic args = parameter;
+                try { sourceObj = args.Item1; } catch { sourceObj = args.Source; }
+                try { targetObj = args.Item2; } catch { targetObj = args.Target; }
+            }
 
             var source = sourceObj as FlowNodeViewModel;
             var target = targetObj as FlowNodeViewModel;
@@ -197,14 +210,10 @@ public partial class DagEditorViewModel : ObservableObject
                     Connections.Add(new FlowConnectionViewModel(source, target, new EdgeCondition.Fallback()));
                 }
             }
-            else
-            {
-                System.Windows.MessageBox.Show($"[Debug] CreateConnection Failed.\nSource: {sourceObj?.GetType().Name}\nTarget: {targetObj?.GetType().Name}");
-            }
         }
         catch (System.Exception ex)
         {
-            System.Windows.MessageBox.Show($"[Debug] CreateConnection Exception:\n{ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Debug] CreateConnection Exception:\n{ex.Message}");
         }
     }
 
