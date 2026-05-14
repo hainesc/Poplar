@@ -177,7 +177,7 @@ public partial class DagEditorViewModel : ObservableObject
             {
                 if (!Connections.Any(c => c.Source == source && c.Target == target))
                 {
-                    Connections.Add(new FlowConnectionViewModel(source, target, EdgeCondition.Success));
+                    Connections.Add(new FlowConnectionViewModel(source, target, new EdgeCondition.Fallback()));
                 }
             }
         }
