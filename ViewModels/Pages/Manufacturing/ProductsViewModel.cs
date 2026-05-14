@@ -71,9 +71,9 @@ public partial class ProductsViewModel : ObservableObject
         var result = await _dialogService.ShowSimpleDialogAsync(
             new SimpleContentDialogCreateOptions
             {
-                Title = "Add New Product",
+                Title = "New Production DNA",
                 Content = content,
-                PrimaryButtonText = "Save",
+                PrimaryButtonText = "Initialize Orchestration",
                 CloseButtonText = "Cancel"
             }
         );
