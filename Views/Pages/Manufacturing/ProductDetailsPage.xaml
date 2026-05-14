@@ -253,12 +253,22 @@
                                 DataContext="{Binding ViewModel.DagEditor}"
                                 ItemsSource="{Binding Nodes}"
                                 Connections="{Binding Connections}"
-                                SelectedItems="{Binding SelectedNode}"
+                                SelectedItem="{Binding SelectedItem}"
                                 DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                 ConnectionCompletedCommand="{Binding CreateConnectionCommand}"
                                 AllowDrop="True"
                                 Drop="OnNodifyEditorDrop"
                                 Background="Transparent">
+                                
+                                <nodify:NodifyEditor.InputBindings>
+                                    <KeyBinding Key="Delete" Command="{Binding DeleteSelectedCommand}" />
+                                    <KeyBinding Key="Backspace" Command="{Binding DeleteSelectedCommand}" />
+                                </nodify:NodifyEditor.InputBindings>
+
+                                <nodify:NodifyEditor.PendingConnection>
+                                    <nodify:PendingConnection IsVisible="{Binding IsConnecting}"
+                                                              Source="{Binding PendingConnectionSource}" />
+                                </nodify:NodifyEditor.PendingConnection>
                                 
                                 <nodify:NodifyEditor.Resources>
                                     <Style TargetType="{x:Type nodify:PendingConnection}">

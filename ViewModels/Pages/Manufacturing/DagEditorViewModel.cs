@@ -19,9 +19,21 @@ public partial class DagEditorViewModel : ObservableObject
     [ObservableProperty] private FlowNodeViewModel? _selectedNode;
     [ObservableProperty] private FlowConnectionViewModel? _selectedConnection;
 
+    private object? _selectedItem;
+    public object? SelectedItem
+    {
+        get => _selectedItem;
+        set
+        {
+            SetProperty(ref _selectedItem, value);
+            SelectedNode = value as FlowNodeViewModel;
+            SelectedConnection = value as FlowConnectionViewModel;
+        }
+    }
+
     // For manual connections
-    public Point PendingConnectionSource { get; set; }
-    public bool IsConnecting { get; set; }
+    [ObservableProperty] private Point _pendingConnectionSource;
+    [ObservableProperty] private bool _isConnecting;
 
     public void Initialize(StepMetadata[] metadata)
     {
@@ -143,17 +155,17 @@ public partial class DagEditorViewModel : ObservableObject
     [RelayCommand]
     private void DeleteSelected()
     {
-        if (SelectedNode != null)
+        if (SelectedItem is FlowNodeViewModel node)
         {
-            var toRemove = Connections.Where(c => c.Source == SelectedNode || c.Target == SelectedNode).ToList();
+            var toRemove = Connections.Where(c => c.Source == node || c.Target == node).ToList();
             foreach (var c in toRemove) Connections.Remove(c);
-            Nodes.Remove(SelectedNode);
-            SelectedNode = null;
+            Nodes.Remove(node);
+            SelectedItem = null;
         }
-        else if (SelectedConnection != null)
+        else if (SelectedItem is FlowConnectionViewModel conn)
         {
-            Connections.Remove(SelectedConnection);
-            SelectedConnection = null;
+            Connections.Remove(conn);
+            SelectedItem = null;
         }
     }
 
