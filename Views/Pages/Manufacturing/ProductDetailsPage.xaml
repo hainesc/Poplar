@@ -7,6 +7,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:nodify="https://miroiu.github.io/nodify"
+    xmlns:stump="clr-namespace:uniffi.stump"
     xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
     xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
     Title="Product Configuration Hub"
@@ -83,34 +84,63 @@
             <TabItem Header="PLC Tag Mapping">
                 <Grid Margin="0,16,0,0">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     
-                    <DataGrid Grid.Row="0"
+                    <!-- Action Bar -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12" HorizontalAlignment="Right">
+                        <ui:Button Appearance="Secondary" 
+                                   Content="Bulk Import" 
+                                   Icon="{ui:SymbolIcon DocumentArrowUp24}"
+                                   Command="{Binding ViewModel.BulkImportTagsCommand}" 
+                                   Margin="0,0,8,0" />
+                        <ui:Button Appearance="Secondary" 
+                                   Content="Add Tag" 
+                                   Icon="{ui:SymbolIcon Add24}"
+                                   Command="{Binding ViewModel.AddTagCommand}" />
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="1"
                               ItemsSource="{Binding ViewModel.PlcTags}"
                               AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="True">
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tag Name" Binding="{Binding name}" Width="150" />
+                            <DataGridTextColumn Header="Tag Name" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" />
                             <DataGridComboBoxColumn Header="Direction" 
-                                                    SelectedItemBinding="{Binding direction}">
+                                                    SelectedItemBinding="{Binding Direction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                 <DataGridComboBoxColumn.ItemsSource>
-                                    <x:Array Type="{x:Type sys:String}">
-                                        <sys:String>H-&gt;P</sys:String>
-                                        <sys:String>P-&gt;H</sys:String>
+                                    <x:Array Type="{x:Type stump:PlcTagDirection}">
+                                        <stump:PlcTagDirection>HmiToPlc</stump:PlcTagDirection>
+                                        <stump:PlcTagDirection>PlcToHmi</stump:PlcTagDirection>
                                     </x:Array>
                                 </DataGridComboBoxColumn.ItemsSource>
                             </DataGridComboBoxColumn>
-                            <DataGridTextColumn Header="Byte Offset" Binding="{Binding byteOffset}" Width="100"/>
-                            <DataGridTextColumn Header="Bit Offset" Binding="{Binding bitOffset}" Width="100"/>
-                            <DataGridTextColumn Header="Data Type" Binding="{Binding valueType}" Width="120"/>
-                            <DataGridTextColumn Header="Description" Binding="{Binding description}" Width="*" />
+                            <DataGridTextColumn Header="Byte" Binding="{Binding ByteOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <DataGridTextColumn Header="Bit" Binding="{Binding BitOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                            <DataGridTextColumn Header="Data Type" Binding="{Binding ValueType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*" />
+                            
+                            <!-- Delete Column -->
+                            <DataGridTemplateColumn Width="50">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:Button Appearance="Transparent" 
+                                                   Icon="{ui:SymbolIcon Delete24}" 
+                                                   Foreground="{DynamicResource PaletteRedBrush}"
+                                                   Command="{Binding DataContext.ViewModel.DeleteTagCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                   CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <ui:Button Grid.Row="1" 
+                    <ui:Button Grid.Row="2" 
                                Appearance="Primary" 
                                Content="Save Tag Mappings" 
                                Icon="{ui:SymbolIcon Save24}"

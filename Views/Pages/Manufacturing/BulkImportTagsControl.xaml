@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="Poplar.Views.Pages.Manufacturing.BulkImportTagsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DesignHeight="400"
+    d:DesignWidth="500"
+    mc:Ignorable="d">
+
+    <StackPanel Margin="0,10,0,0">
+        <Border Padding="12" Background="{DynamicResource ControlFillColorSecondaryBrush}" CornerRadius="8" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock FontWeight="Bold" Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" Text="Instructions:" Margin="0,0,0,4"/>
+                <TextBlock Text="Use [PLC->PC] or [PC->PLC] headers to switch direction." Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Text="Format: Offset Name Type" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8"/>
+                <TextBlock Text="Example:" Foreground="{DynamicResource TextFillColorSecondaryBrush}" FontStyle="Italic"/>
+                <TextBlock Text="[PLC->PC]" FontFamily="Consolas" Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                <TextBlock Text="0.0 Heartbeat Bool" FontFamily="Consolas" Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                <TextBlock Text="8 AVValue Real" FontFamily="Consolas" Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <ui:TextBox
+            x:Name="ImportTextBox"
+            Height="200"
+            AcceptsReturn="True"
+            FontFamily="Consolas"
+            PlaceholderText="Paste your address mapping here..."
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto" />
+    </StackPanel>
+</UserControl>

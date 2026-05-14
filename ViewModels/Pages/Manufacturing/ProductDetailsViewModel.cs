@@ -4,6 +4,7 @@ using Poplar.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Wpf.Ui.Controls;
+using Poplar.Views.Pages.Manufacturing;
 
 namespace Poplar.ViewModels.Pages.Manufacturing;
 
@@ -12,6 +13,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     private readonly ProductService _productService;
     private readonly DeviceService _deviceService;
     private readonly ISnackbarService _snackbarService;
+    private readonly IContentDialogService _dialogService;
     private int _productId;
     private bool _isInitialized;
 
@@ -27,7 +29,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
 
     // PLC Tags Tab
     [ObservableProperty]
-    private ObservableCollection<PlcTagRecord> _plcTags = new();
+    private ObservableCollection<PlcTagViewModel> _plcTags = new();
 
     // Traceability Tab
     [ObservableProperty]
@@ -41,11 +43,13 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     public ProductDetailsViewModel(
         ProductService productService,
         DeviceService deviceService,
-        ISnackbarService snackbarService)
+        ISnackbarService snackbarService,
+        IContentDialogService dialogService)
     {
         _productService = productService;
         _deviceService = deviceService;
         _snackbarService = snackbarService;
+        _dialogService = dialogService;
     }
 
     public async Task InitializeAsync(int productId)
@@ -102,7 +106,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
         PlcTags.Clear();
         foreach (var tag in tags)
         {
-            PlcTags.Add(tag);
+            PlcTags.Add(new PlcTagViewModel(tag));
         }
     }
 
@@ -146,13 +150,105 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            var tagsArray = PlcTags.ToArray();
+            var tagsArray = PlcTags.Select(t => t.ToRecord()).ToArray();
             await _productService.SyncProductTagsAsync(_productId, tagsArray);
             ShowSuccess("PLC Tags Saved");
         }
         catch (System.Exception ex)
         {
             ShowError("Save Failed", ex.Message);
+        }
+    }
+
+    [RelayCommand]
+    private void AddTag()
+    {
+        PlcTags.Add(new PlcTagViewModel
+        {
+            Direction = PlcTagDirection.PlcToHmi,
+            ValueType = "bool",
+            ProductId = _productId
+        });
+    }
+
+    [RelayCommand]
+    private void DeleteTag(PlcTagViewModel tag)
+    {
+        if (tag != null && PlcTags.Contains(tag))
+        {
+            PlcTags.Remove(tag);
+        }
+    }
+
+    [RelayCommand]
+    private async Task BulkImportTagsAsync()
+    {
+        var control = new BulkImportTagsControl();
+        var result = await _dialogService.ShowSimpleDialogAsync(new SimpleContentDialogCreateOptions
+        {
+            Title = "Bulk Tag Import",
+            Content = control,
+            PrimaryButtonText = "Confirm & Append",
+            CloseButtonText = "Cancel"
+        });
+
+        if (result == ContentDialogResult.Primary)
+        {
+            var text = control.GetImportText();
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var currentDirection = PlcTagDirection.PlcToHmi;
+
+            foreach (var line in lines)
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed)) continue;
+
+                if (trimmed == "[PLC->PC]" || trimmed == "[PLC->HMI]")
+                {
+                    currentDirection = PlcTagDirection.PlcToHmi;
+                    continue;
+                }
+                if (trimmed == "[PC->PLC]" || trimmed == "[HMI->PLC]")
+                {
+                    currentDirection = PlcTagDirection.HmiToPlc;
+                    continue;
+                }
+
+                var parts = trimmed.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 3)
+                {
+                    var addrPart = parts[0];
+                    var namePart = parts[1];
+                    var typePart = parts[2];
+
+                    int byteOffset = 0;
+                    int bitOffset = 0;
+
+                    if (addrPart.Contains("."))
+                    {
+                        var split = addrPart.Split('.');
+                        int.TryParse(split[0], out byteOffset);
+                        int.TryParse(split[1], out bitOffset);
+                    }
+                    else
+                    {
+                        int.TryParse(addrPart, out byteOffset);
+                    }
+
+                    PlcTags.Add(new PlcTagViewModel
+                    {
+                        Name = namePart,
+                        Direction = currentDirection,
+                        ByteOffset = byteOffset,
+                        BitOffset = bitOffset,
+                        ValueType = typePart.ToLower(),
+                        Description = string.Empty,
+                        ProductId = _productId
+                    });
+                }
+            }
         }
     }
 
