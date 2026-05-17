@@ -17,6 +17,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     private readonly IContentDialogService _dialogService;
     private int _productId;
     private bool _isInitialized;
+    private readonly List<int> _originalSelectedDeviceIds = new();
 
     [ObservableProperty]
     private Product? _currentProduct;
@@ -97,15 +98,22 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         var devices = await _deviceService.GetDevicesAsync();
         AvailableDevices.Clear();
+        _originalSelectedDeviceIds.Clear();
         
         var associatedDeviceNames = CurrentProduct?.devices ?? Array.Empty<string>();
 
         foreach (var d in devices)
         {
+            bool isSelected = associatedDeviceNames.Contains(d.name);
             AvailableDevices.Add(new DeviceSelectionItem(d)
             {
-                IsSelected = associatedDeviceNames.Contains(d.name)
+                IsSelected = isSelected
             });
+
+            if (isSelected)
+            {
+                _originalSelectedDeviceIds.Add(d.id);
+            }
         }
     }
 
@@ -144,12 +152,29 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            var selectedDevices = AvailableDevices
+            var currentSelectedDeviceIds = AvailableDevices
                 .Where(x => x.IsSelected)
-                .Select(x => x.Device.name)
-                .ToArray();
+                .Select(x => x.id)
+                .ToList();
 
-            await _productService.UpdateProductAsync(_productId, ProductName, selectedDevices);
+            var toLink = currentSelectedDeviceIds.Where(id => !_originalSelectedDeviceIds.Contains(id)).ToList();
+            var toUnlink = _originalSelectedDeviceIds.Where(id => !currentSelectedDeviceIds.Contains(id)).ToList();
+
+            var tasks = new List<Task>();
+            foreach (var deviceId in toLink)
+            {
+                tasks.Add(_productService.LinkDeviceAsync(_productId, deviceId));
+            }
+            foreach (var deviceId in toUnlink)
+            {
+                tasks.Add(_productService.UnlinkDeviceAsync(_productId, deviceId));
+            }
+
+            await Task.WhenAll(tasks);
+
+            await LoadProductAsync();
+            await LoadHardwareAsync();
+
             ShowSuccess("Hardware Association Saved");
         }
         catch (System.Exception ex)

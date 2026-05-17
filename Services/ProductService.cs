@@ -42,6 +42,18 @@ public sealed class ProductService
         await _backend.ProductVm.UpdateProduct(id, name, deviceNames);
     }
 
+    public async Task LinkDeviceAsync(int productId, int deviceId)
+    {
+        await EnsureInitialized();
+        await _backend.ProductVm.LinkDevice(productId, deviceId);
+    }
+
+    public async Task UnlinkDeviceAsync(int productId, int deviceId)
+    {
+        await EnsureInitialized();
+        await _backend.ProductVm.UnlinkDevice(productId, deviceId);
+    }
+
     public async Task DeleteProductAsync(int id)
     {
         await EnsureInitialized();
