@@ -13,6 +13,7 @@ public partial class FlowNodeViewModel : ObservableObject
     [ObservableProperty] private string _stepType = string.Empty;
     [ObservableProperty] private string _displayName = string.Empty;
     [ObservableProperty] private bool _isEntry;
+    [ObservableProperty] private bool _isActiveStep;
     [ObservableProperty] private Point _location;
     [ObservableProperty] private Point _inputAnchor;
     [ObservableProperty] private Point _outputAnchor;

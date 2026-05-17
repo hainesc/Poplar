@@ -58,6 +58,7 @@ public partial class MainWindowViewModel : ViewModel
                 new NavigationViewItem("Devices", SymbolRegular.SpeakerSettings24, typeof(Poplar.Views.Pages.Manufacturing.DevicesPage)),
                 new NavigationViewItem("Products", SymbolRegular.Box24, typeof(Poplar.Views.Pages.Manufacturing.ProductsPage)),
                 new NavigationViewItem("Work Orders", SymbolRegular.Clipboard24, typeof(Poplar.Views.Pages.Manufacturing.WorkOrdersPage)),
+                new NavigationViewItem("Runtime", SymbolRegular.Play24, typeof(Poplar.Views.Pages.Manufacturing.RuntimePage)),
             }
         },
         new NavigationViewItemSeparator(),

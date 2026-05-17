@@ -1,0 +1,546 @@
+<Page
+    x:Class="Poplar.Views.Pages.Manufacturing.RuntimePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:nodify="https://miroiu.github.io/nodify"
+    xmlns:stump="clr-namespace:uniffi.stump"
+    xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
+    xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
+    xmlns:helpers="clr-namespace:Poplar.Helpers"
+    Title="Manufacturing Runtime"
+    d:DataContext="{d:DesignInstance vm:RuntimeViewModel, IsDesignTimeCreatable=False}"
+    d:DesignHeight="768"
+    d:DesignWidth="1024"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
+
+        <!-- Glow Shadow Effect for active steps -->
+        <DropShadowEffect x:Key="ActiveGlowEffect" Color="#D4AF37" BlurRadius="20" ShadowDepth="0" Opacity="0.8" />
+    </Page.Resources>
+
+    <Grid Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- 1. Header Control Panel -->
+        <Border Grid.Row="0" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Title & Status Indicator -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Manufacturing Runtime" FontSize="20" FontWeight="Bold" FontFamily="Segoe UI, Outfit" Margin="0,0,16,0" />
+                    
+                    <!-- Dynamic State Badge -->
+                    <Border CornerRadius="12" Padding="8,4" VerticalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#33808080" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="Background" Value="#2200FF00" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                        <Setter Property="Background" Value="#22FFFF00" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsStale}" Value="True">
+                                        <Setter Property="Background" Value="#22FF0000" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Indicator Dot -->
+                            <Ellipse Width="8" Height="8" Margin="0,0,6,0" VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#808080" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                <Setter Property="Fill" Value="#107C41" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                                <Setter Property="Fill" Value="#EAA300" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsStale}" Value="True">
+                                                <Setter Property="Fill" Value="#D83B01" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+
+                            <TextBlock FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="IDLE" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                <Setter Property="Text" Value="RUNNING" />
+                                                <Setter Property="Foreground" Value="#107C41" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                                <Setter Property="Text" Value="PAUSED" />
+                                                <Setter Property="Foreground" Value="#EAA300" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="- IsStale" Value="True">
+                                                <Setter Property="Text" Value="STALE / CRITICAL" />
+                                                <Setter Property="Foreground" Value="#D83B01" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Active Work Order Selection -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Active Batch / Work Order:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <ComboBox ItemsSource="{Binding WorkOrders}"
+                              SelectedItem="{Binding SelectedWorkOrder}"
+                              DisplayMemberPath="title"
+                              Width="260"
+                              IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                    <ui:Button Icon="{ui:SymbolIcon Refresh24}" 
+                               Command="{Binding LoadWorkOrdersCommand}"
+                               Appearance="Secondary"
+                               Margin="8,0,0,0"
+                               ToolTip="Refresh Work Order list"
+                               IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                </StackPanel>
+
+                <!-- Execution Controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Play -->
+                    <ui:Button Icon="{ui:SymbolIcon Play24}" 
+                               Command="{Binding StartCommand}"
+                               Appearance="Primary"
+                               Foreground="White"
+                               Background="#107C41"
+                               BorderBrush="#107C41"
+                               Margin="0,0,8,0"
+                               ToolTip="Activate production flow"
+                               IsEnabled="{Binding SelectedWorkOrder, Converter={StaticResource NotNullToVisibilityConverter}}">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+
+                    <!-- Pause -->
+                    <ui:Button Icon="{ui:SymbolIcon Pause24}" 
+                               Command="{Binding TogglePauseCommand}"
+                               Appearance="Secondary"
+                               Margin="0,0,8,0"
+                               ToolTip="Pause / Resume processing">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+
+                    <!-- Stop -->
+                    <ui:Button Icon="{ui:SymbolIcon Stop24}" 
+                               Command="{Binding StopCommand}"
+                               Appearance="Secondary"
+                               Foreground="#D83B01"
+                               ToolTip="Stop / Reset active batch">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Setter Property="IsEnabled" Value="False" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. Main Dashboard Workspace -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="8*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT COLUMN: Live DAG & Traceability logs -->
+            <Grid Grid.Column="0" Margin="0,0,16,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="2*" />
+                </Grid.RowDefinitions>
+
+                <!-- Process Flow Canvas -->
+                <Border Grid.Row="0" Margin="0,0,0,16" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                    <Grid>
+                        <!-- Section Label -->
+                        <Border VerticalAlignment="Top" HorizontalAlignment="Left" Background="#0C808080" CornerRadius="4,0,8,0" Padding="8,4" Panel.ZIndex="10">
+                            <TextBlock Text="LIVE PROCESS TOPOLOGY MAP" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </Border>
+
+                        <nodify:NodifyEditor 
+                            DataContext="{Binding DagEditor}"
+                            ItemsSource="{Binding Nodes}"
+                            Connections="{Binding Connections}"
+                            Background="Transparent"
+                            IsEnabled="False"> <!-- Keep completely read-only -->
+                            
+                            <nodify:NodifyEditor.ItemContainerStyle>
+                                <Style TargetType="{x:Type nodify:ItemContainer}">
+                                    <Setter Property="Location" Value="{Binding Location}" />
+                                </Style>
+                            </nodify:NodifyEditor.ItemContainerStyle>
+
+                            <nodify:NodifyEditor.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:FlowNodeViewModel}">
+                                    <!-- Dynamic step outline highlight -->
+                                    <Border CornerRadius="8" BorderThickness="3">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="BorderBrush" Value="Transparent" />
+                                                <Setter Property="Effect" Value="{x:Null}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActiveStep}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="#D4AF37" />
+                                                        <Setter Property="Effect" Value="{StaticResource ActiveGlowEffect}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
+                                        <nodify:Node Header="{Binding DisplayName}">
+                                            <nodify:Node.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Visibility="{Binding DataContext.IsEntry, RelativeSource={RelativeSource AncestorType=nodify:Node}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}" Padding="6,2" CornerRadius="4" Margin="0,0,8,0">
+                                                            <TextBlock Text="START" FontSize="9" FontWeight="Bold" Foreground="White" />
+                                                        </Border>
+                                                        <TextBlock Text="{Binding}" FontWeight="Bold" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </nodify:Node.HeaderTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <nodify:NodeInput Grid.Column="0" Header="In" IsConnected="True" 
+                                                                  DataContext="{Binding}"
+                                                                  Anchor="{Binding InputAnchor, Mode=OneWayToSource}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Id}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,10" Opacity="0.5" />
+                                                <nodify:NodeOutput Grid.Column="2" Header="Out" IsConnected="True" 
+                                                                   DataContext="{Binding}"
+                                                                   Anchor="{Binding OutputAnchor, Mode=OneWayToSource}" />
+                                            </Grid>
+                                        </nodify:Node>
+                                    </Border>
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ItemTemplate>
+
+                            <nodify:NodifyEditor.ConnectionTemplate>
+                                <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
+                                    <nodify:Connection Source="{Binding Source.OutputAnchor}"
+                                                       Target="{Binding Target.InputAnchor}" />
+                                </DataTemplate>
+                            </nodify:NodifyEditor.ConnectionTemplate>
+                        </nodify:NodifyEditor>
+
+                        <!-- Auto Layout button for read-only visualization -->
+                        <ui:Button Content="Reset Layout" 
+                                   Command="{Binding DagEditor.AutoLayoutCommand}" 
+                                   Appearance="Secondary" 
+                                   VerticalAlignment="Bottom" 
+                                   HorizontalAlignment="Right" 
+                                   Margin="12" />
+                    </Grid>
+                </Border>
+
+                <!-- Traceability Logs Table -->
+                <Border Grid.Row="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Panel Header -->
+                        <Border Grid.Row="0" Background="#0C808080" CornerRadius="8,8,0,0" Padding="12,8">
+                            <TextBlock Text="RECENT TRACEABILITY LOGS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </Border>
+
+                        <DataGrid Grid.Row="1"
+                                  ItemsSource="{Binding TraceabilityLogs}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  HorizontalGridLinesBrush="{DynamicResource ControlStrokeColorDefaultBrush}">
+                            <DataGrid.Columns>
+                                <!-- Time -->
+                                <DataGridTextColumn Header="Timestamp" Binding="{Binding CreatedAt}" Width="150" />
+                                
+                                <!-- Outcome Badge -->
+                                <DataGridTemplateColumn Header="Result" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="#22FF0000" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                <Setter Property="Background" Value="#2200FF00" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                
+                                                <TextBlock FontSize="10" FontWeight="Bold">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="REJECT" />
+                                                            <Setter Property="Foreground" Value="#D83B01" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                    <Setter Property="Text" Value="PASS" />
+                                                                    <Setter Property="Foreground" Value="#107C41" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <!-- Process Step ID -->
+                                <DataGridTextColumn Header="Step ID" Binding="{Binding ProcessId}" Width="150" />
+
+                                <!-- Mapped Trace Data payload -->
+                                <DataGridTemplateColumn Header="Payload Attributes" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Data}" 
+                                                       FontFamily="Consolas" 
+                                                       FontSize="11" 
+                                                       VerticalAlignment="Center" 
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Margin="8,0"
+                                                       Opacity="0.8" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- RIGHT COLUMN: Prompt Center & Performance Intelligence -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Strategic Prompt Center -->
+                <Border Grid.Row="0" Margin="0,0,0,16" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorBaseBrush}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentInstructionType}" Value="Warning">
+                                    <Setter Property="Background" Value="#11FFF700" />
+                                    <Setter Property="BorderBrush" Value="#FFAF00" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentInstructionType}" Value="Error">
+                                    <Setter Property="Background" Value="#11FF0000" />
+                                    <Setter Property="BorderBrush" Value="#FF3B00" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="1" />
+                            <RowDefinition Height="140" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <TextBlock Grid.Row="0" Text="STRATEGIC PROMPT CENTER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" />
+
+                        <!-- Main Big Message -->
+                        <TextBlock Grid.Row="1" 
+                                   Text="{Binding CurrentInstruction}" 
+                                   TextWrapping="Wrap" 
+                                   FontSize="16" 
+                                   FontWeight="SemiBold" 
+                                   FontFamily="Georgia" 
+                                   LineHeight="24"
+                                   Margin="0,0,0,16" />
+
+                        <!-- Divider -->
+                        <Border Grid.Row="2" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="0,0,0,8" />
+
+                        <!-- Historical Messages -->
+                        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding ProcessLogs}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" 
+                                                   TextWrapping="Wrap" 
+                                                   FontSize="11" 
+                                                   Margin="0,0,0,6" 
+                                                   Opacity="0.75" 
+                                                   FontFamily="Segoe UI" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Performance Intelligence Board (KPIs) -->
+                <Border Grid.Row="1" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Background="{DynamicResource SolidBackgroundFillColorBaseBrush}" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <TextBlock Grid.Row="0" Text="PERFORMANCE INTELLIGENCE BOARD" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,16" />
+
+                        <!-- Yield and KPI Grid -->
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                            <!-- Circular or Big Display yield -->
+                            <Border BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="QUALITY YIELD" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                                    <TextBlock FontSize="36" FontWeight="Black" HorizontalAlignment="Center">
+                                        <Run Text="{Binding YieldRate, Mode=OneWay}" />
+                                        <Run Text="%" FontSize="20" />
+                                    </TextBlock>
+                                    <Border CornerRadius="4" Padding="6,2" Margin="0,6,0,0" HorizontalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#22EAA300" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding YieldStatus}" Value="EXCELLENT">
+                                                        <Setter Property="Background" Value="#22107C41" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding YieldStatus}" Value="WARNING">
+                                                        <Setter Property="Background" Value="#22D83B01" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        
+                                        <TextBlock FontSize="10" FontWeight="Bold">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="WARNING" />
+                                                    <Setter Property="Foreground" Value="#D83B01" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding YieldStatus}" Value="EXCELLENT">
+                                                            <Setter Property="Text" Value="EXCELLENT" />
+                                                            <Setter Property="Foreground" Value="#107C41" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding YieldStatus}" Value="OK">
+                                                            <Setter Property="Text" Value="STABLE" />
+                                                            <Setter Property="Foreground" Value="#107C41" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Processed Counter Card -->
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Processed -->
+                                <Border Grid.Column="0" Margin="0,0,6,0" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="PROCESSED" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="{Binding ProcessedCount}" FontSize="24" FontWeight="Bold" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Scrap -->
+                                <Border Grid.Column="1" Margin="6,0,0,0" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}">
+                                    <StackPanel>
+                                        <TextBlock Text="DEFECTS / SCRAP" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="{Binding ScrapCount}" FontSize="24" FontWeight="Bold" Foreground="#D83B01" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Gradient progress bar -->
+                            <TextBlock Text="YIELD METRIC REACH" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,8,0,6" />
+                            <Grid Height="12">
+                                <ProgressBar Value="{Binding YieldRate}" Minimum="0" Maximum="100" Height="8" VerticalAlignment="Center">
+                                    <ProgressBar.Foreground>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#D83B01" Offset="0.0" />
+                                            <GradientStop Color="#EAA300" Offset="0.6" />
+                                            <GradientStop Color="#107C41" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </ProgressBar.Foreground>
+                                </ProgressBar>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

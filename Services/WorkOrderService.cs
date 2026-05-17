@@ -40,4 +40,31 @@ public sealed class WorkOrderService
         await EnsureInitialized();
         return await _backend.WorkOrderVm.AddWorkOrder(title, productId, quantity);
     }
+
+    /// <summary>
+    /// Activates a work order for execution.
+    /// </summary>
+    public async Task ActivateWorkOrderAsync(int id)
+    {
+        await EnsureInitialized();
+        await _backend.WorkOrderVm.ActivateWorkOrder(id);
+    }
+
+    /// <summary>
+    /// Pauses an active work order.
+    /// </summary>
+    public async Task PauseWorkOrderAsync(int id)
+    {
+        await EnsureInitialized();
+        await _backend.WorkOrderVm.PauseWorkOrder(id);
+    }
+
+    /// <summary>
+    /// Stops / cancels a work order.
+    /// </summary>
+    public async Task StopWorkOrderAsync(int id)
+    {
+        await EnsureInitialized();
+        await _backend.WorkOrderVm.StopWorkOrder(id);
+    }
 }
