@@ -60,7 +60,7 @@
                                             Background="{DynamicResource ControlFillColorDefaultBrush}"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center">
-                                        <ui:SymbolIcon Symbol="Cpu24" 
+                                        <ui:SymbolIcon Symbol="Desktop24" 
                                                        x:Name="CpuIcon"
                                                        Filled="False"
                                                        FontSize="18"
