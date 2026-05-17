@@ -194,7 +194,7 @@
                     Background="Transparent">
                     <StackPanel HorizontalAlignment="Center">
                         <ui:SymbolIcon 
-                            Symbol="ClipboardTaskList24" 
+                            Symbol="Clipboard24" 
                             FontSize="48" 
                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                             HorizontalAlignment="Center"
