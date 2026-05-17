@@ -1,0 +1,236 @@
+<Page
+    x:Class="Poplar.Views.Pages.Manufacturing.WorkOrdersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
+    Title="Work Orders"
+    d:DataContext="{d:DesignInstance local:WorkOrdersPage, IsDesignTimeCreatable=False}"
+    d:DesignHeight="600"
+    d:DesignWidth="1000"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Page.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock
+                FontSize="28"
+                FontWeight="Bold"
+                Text="Production Batches" />
+            <TextBlock
+                Margin="0,4,0,0"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Monitor real-time manufacturing batches, execution stats, and process progress" />
+        </StackPanel>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="1">
+            <ScrollViewer x:Name="WorkOrdersScroll" HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer.Style>
+                    <Style TargetType="ScrollViewer">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewModel.WorkOrders.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
+                <ItemsControl ItemsSource="{Binding ViewModel.WorkOrders}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:WorkOrderItemViewModel}">
+                            <ui:Card
+                                Width="290"
+                                Height="230"
+                                Margin="0,0,16,16"
+                                Padding="0">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Active top pulse highlight -->
+                                    <Border 
+                                        Grid.Row="0" 
+                                        Height="3" 
+                                        VerticalAlignment="Top"
+                                        Background="{Binding StatusColor}"
+                                        Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibility}}" />
+
+                                    <!-- Row 0: Status & Date -->
+                                    <Grid Grid.Row="0" Margin="16,16,16,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Translucent Status Badge (Tailwind style) -->
+                                        <Border
+                                            Padding="10,4"
+                                            CornerRadius="10"
+                                            BorderThickness="1"
+                                            BorderBrush="{Binding StatusColor}"
+                                            Background="#05000000">
+                                            <TextBlock
+                                                FontSize="9"
+                                                FontWeight="Bold"
+                                                Foreground="{Binding StatusColor}"
+                                                Text="{Binding StatusText}" />
+                                        </Border>
+
+                                        <!-- Date -->
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Opacity="0.7"
+                                            Text="{Binding Record.createdAt}" />
+                                    </Grid>
+
+                                    <!-- Row 1: Title & Product DNA -->
+                                    <StackPanel Grid.Row="1" Margin="16,4,16,12" VerticalAlignment="Center">
+                                        <!-- Batch Title -->
+                                        <TextBlock
+                                            FontSize="18"
+                                            FontWeight="Bold"
+                                            Text="{Binding Record.title}"
+                                            TextTrimming="CharacterEllipsis" />
+                                        
+                                        <!-- Product Associated -->
+                                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                            <ui:SymbolIcon Symbol="Box24" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                            <TextBlock 
+                                                Margin="6,0,0,0" 
+                                                FontSize="12" 
+                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                Text="{Binding ProductName}"
+                                                TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Row 2: Production Progress Box -->
+                                    <Border
+                                        Grid.Row="2"
+                                        Margin="16,0,16,16"
+                                        Padding="12"
+                                        CornerRadius="12"
+                                        Background="{DynamicResource ControlFillColorTertiaryBrush}"
+                                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                        BorderThickness="1">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,6">
+                                                <TextBlock
+                                                    FontSize="10"
+                                                    FontWeight="Bold"
+                                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                    Text="TARGET PRODUCTION" />
+                                                <TextBlock
+                                                    HorizontalAlignment="Right"
+                                                    FontSize="12"
+                                                    FontWeight="Bold">
+                                                    <Run Text="{Binding Record.processedCount}" />
+                                                    <Run Text=" / " Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                    <Run Text="{Binding Record.quantity}" />
+                                                    <Run Text=" units" FontSize="9" FontWeight="Normal" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                </TextBlock>
+                                            </Grid>
+                                            <ProgressBar
+                                                Height="4"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                Value="{Binding ProgressPercent, Mode=OneWay}"
+                                                Foreground="{Binding StatusColor}"
+                                                Background="{DynamicResource ControlFillColorDefaultBrush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </ui:Card>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Empty State Placeholder -->
+            <Grid x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,50,0,0">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ViewModel.WorkOrders.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Border
+                    Width="500"
+                    Padding="32"
+                    CornerRadius="24"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="2"
+                    Background="Transparent">
+                    <StackPanel HorizontalAlignment="Center">
+                        <ui:SymbolIcon 
+                            Symbol="ClipboardTaskList24" 
+                            FontSize="48" 
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,16" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Center"
+                            Text="No Active Production Batches" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            HorizontalAlignment="Center"
+                            Text="Launch a new batch execution to begin manufacturing orchestration" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Launch Batch Floating Button -->
+        <ui:Button
+            Grid.Row="1"
+            Width="150"
+            Height="48"
+            Margin="0,0,24,24"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Appearance="Primary"
+            Command="{Binding ViewModel.AddWorkOrderCommand}"
+            CornerRadius="24"
+            Padding="16,0">
+            <StackPanel Orientation="Horizontal">
+                <ui:SymbolIcon Symbol="Add24" FontSize="16" Margin="0,0,8,0"/>
+                <TextBlock FontSize="12" FontWeight="Bold" Text="LAUNCH BATCH" VerticalAlignment="Center"/>
+            </StackPanel>
+        </ui:Button>
+    </Grid>
+</Page>

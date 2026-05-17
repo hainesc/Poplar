@@ -50,6 +50,7 @@ public partial class App
                 _ = services.AddSingleton<ProductService>();
                 _ = services.AddSingleton<SessionManager>();
                 _ = services.AddSingleton<DeviceService>();
+                _ = services.AddSingleton<WorkOrderService>();
 
                 // Top-level pages
                 _ = services.AddSingleton<LoginPage>();
@@ -68,6 +69,8 @@ public partial class App
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.ProductsViewModel>();
                 _ = services.AddTransient<Poplar.Views.Pages.Manufacturing.ProductDetailsPage>();
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.ProductDetailsViewModel>();
+                _ = services.AddSingleton<Poplar.Views.Pages.Manufacturing.WorkOrdersPage>();
+                _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.WorkOrdersViewModel>();
 
                 // All other pages and view models
                 _ = services.AddTransientFromNamespace("Poplar.Views", GalleryAssembly.Asssembly);

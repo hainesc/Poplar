@@ -14,6 +14,7 @@ public sealed class BackendService : IDisposable
     private ProductViewModel? _productVm;
     private TraceabilityViewModel? _traceabilityVm;
     private ManufacturingViewModel? _manufacturingVm;
+    private WorkOrderViewModel? _workOrderVm;
     private bool _isInitialized;
     private readonly SemaphoreSlim _initLock = new(1, 1);
 
@@ -53,6 +54,12 @@ public sealed class BackendService : IDisposable
         ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
 
     /// <summary>
+    /// The Work Order ViewModel for production batch and work order operations.
+    /// </summary>
+    public WorkOrderViewModel WorkOrderVm => _workOrderVm
+        ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
+
+    /// <summary>
     /// The raw Launcher instance for accessing other ViewModels if needed.
     /// </summary>
     public Launcher Launcher => _launcher
@@ -78,6 +85,7 @@ public sealed class BackendService : IDisposable
             _productVm = _launcher.ProductVm();
             _traceabilityVm = _launcher.TraceabilityVm();
             _manufacturingVm = _launcher.ManufacturingVm();
+            _workOrderVm = _launcher.WorkOrderVm();
 
             _isInitialized = true;
             Debug.WriteLine("[Backend] Initialized successfully.");
@@ -94,6 +102,7 @@ public sealed class BackendService : IDisposable
         _deviceVm?.Dispose();
         _productVm?.Dispose();
         _traceabilityVm?.Dispose();
+        _workOrderVm?.Dispose();
         _launcher?.Dispose();
         _initLock.Dispose();
     }
