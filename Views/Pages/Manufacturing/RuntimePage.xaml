@@ -21,6 +21,7 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
 
         <!-- Glow Shadow Effect for active steps -->
@@ -119,13 +120,13 @@
                               SelectedItem="{Binding SelectedWorkOrder}"
                               DisplayMemberPath="title"
                               Width="260"
-                              IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                              IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanConverter}}" />
                     <ui:Button Icon="{ui:SymbolIcon ArrowSync24}" 
                                Command="{Binding LoadWorkOrdersCommand}"
                                Appearance="Secondary"
                                Margin="8,0,0,0"
                                ToolTip="Refresh Work Order list"
-                               IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                               IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanConverter}}" />
                 </StackPanel>
 
                 <!-- Execution Controls -->
