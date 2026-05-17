@@ -120,7 +120,7 @@
                               DisplayMemberPath="title"
                               Width="260"
                               IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-                    <ui:Button Icon="{ui:SymbolIcon Refresh24}" 
+                    <ui:Button Icon="{ui:SymbolIcon ArrowSync24}" 
                                Command="{Binding LoadWorkOrdersCommand}"
                                Appearance="Secondary"
                                Margin="8,0,0,0"
