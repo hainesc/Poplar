@@ -13,7 +13,7 @@ public partial class RuntimePage : INavigationAware
     public RuntimePage(RuntimeViewModel viewModel)
     {
         ViewModel = viewModel;
-        DataContext = this;
+        DataContext = viewModel;
         InitializeComponent();
     }
 
