@@ -21,6 +21,7 @@ public partial class FlowNodeViewModel : ObservableObject
     public ObservableCollection<StepParamViewModel> Parameters { get; } = new();
     public ObservableCollection<DataMappingViewModel> OutputToContext { get; } = new();
     public ObservableCollection<DataMappingViewModel> OutputToTrace { get; } = new();
+    public List<string> AvailableOutputs { get; } = new();
     
     [ObservableProperty] private StepRetryPolicyViewModel? _retryPolicy;
 
@@ -33,6 +34,11 @@ public partial class FlowNodeViewModel : ObservableObject
         StepType = record.stepType;
         DisplayName = metadata?.displayName ?? record.stepType;
         IsEntry = isEntry;
+
+        if (metadata?.outputData != null)
+        {
+            AvailableOutputs = metadata.outputData.Select(o => o.name).ToList();
+        }
 
         // Initialize Parameters from metadata and record
         if (metadata != null)

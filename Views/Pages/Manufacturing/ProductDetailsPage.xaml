@@ -533,7 +533,10 @@
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
+                                                    <ComboBox Grid.Column="0" 
+                                                              ItemsSource="{Binding DataContext.AvailableOutputs, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedValue="{Binding SourceKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              FontSize="10" HorizontalAlignment="Stretch" />
                                                     <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight24" Margin="4,0" />
                                                     <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Context Key" FontSize="10" />
                                                     <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss24}" Appearance="Transparent" 
@@ -556,9 +559,16 @@
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="Auto" />
                                                     </Grid.ColumnDefinitions>
-                                                    <ui:TextBox Grid.Column="0" Text="{Binding SourceKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Source" FontSize="10" />
+                                                    <ComboBox Grid.Column="0" 
+                                                              ItemsSource="{Binding DataContext.AvailableOutputs, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                              SelectedValue="{Binding SourceKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              FontSize="10" HorizontalAlignment="Stretch" />
                                                     <ui:SymbolIcon Grid.Column="1" Symbol="ArrowRight24" Margin="4,0" />
-                                                    <ui:TextBox Grid.Column="2" Text="{Binding TargetKey, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Trace Field" FontSize="10" />
+                                                    <ComboBox Grid.Column="2" 
+                                                              ItemsSource="{Binding DataContext.ViewModel.TraceabilityItems, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                              SelectedValuePath="Name" DisplayMemberPath="Name"
+                                                              SelectedValue="{Binding TargetKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              FontSize="10" HorizontalAlignment="Stretch" />
                                                     <ui:Button Grid.Column="3" Icon="{ui:SymbolIcon Dismiss24}" Appearance="Transparent" 
                                                                Command="{Binding DataContext.DeleteTraceMappingCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
                                                                CommandParameter="{Binding}" Margin="4,0,0,0" />
