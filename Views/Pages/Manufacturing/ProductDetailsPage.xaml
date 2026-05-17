@@ -91,7 +91,7 @@
                                     <TextBlock FontSize="10" 
                                                FontWeight="SemiBold"
                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                        <Run Text="{Binding protocol}" />
+                                        <Run Text="{Binding protocol, Mode=OneWay}" />
                                         <Run Text=" PROTOCOL" />
                                     </TextBlock>
                                 </StackPanel>
