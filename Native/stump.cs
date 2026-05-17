@@ -693,11 +693,7 @@ public static class _UniFFILib {
     );
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UniffiCallbackInterfaceManufacturingObserverMethod0(
-        ulong @uniffiHandle,RustBuffer @status,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err
-    );
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void UniffiCallbackInterfaceManufacturingObserverMethod1(
-        ulong @uniffiHandle,RustBuffer @message,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err
+        ulong @uniffiHandle,RustBuffer @event,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err
     );
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UniffiCallbackInterfaceWorkOrderObserverMethod0(
@@ -712,8 +708,7 @@ public static class _UniFFILib {
     [StructLayout(LayoutKind.Sequential)]
     public struct UniffiVTableCallbackInterfaceManufacturingObserver
     {
-        public IntPtr @onStatusChanged;
-        public IntPtr @onMessage;
+        public IntPtr @onEvent;
         public IntPtr @uniffiFree;
     }
     [StructLayout(LayoutKind.Sequential)]
@@ -722,6 +717,19 @@ public static class _UniFFILib {
         public IntPtr @onWorkOrderChanged;
         public IntPtr @uniffiFree;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1021,6 +1029,10 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_launcher_traceability_vm(IntPtr @ptr,ref UniffiRustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr uniffi_stump_fn_method_launcher_work_order_vm(IntPtr @ptr,ref UniffiRustCallStatus _uniffi_out_err
     );
 
@@ -1034,6 +1046,10 @@ public static class _UniFFILib {
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr uniffi_stump_fn_method_manufacturingviewmodel_confirm_step(IntPtr @ptr,int @stepId
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_manufacturingviewmodel_get_recent_messages(IntPtr @ptr
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1109,11 +1125,15 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr uniffi_stump_fn_method_productviewmodel_get_traceability_schema(IntPtr @ptr,int @productId
+    public static extern IntPtr uniffi_stump_fn_method_productviewmodel_link_device(IntPtr @ptr,int @productId,int @deviceId
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr uniffi_stump_fn_method_productviewmodel_list_products(IntPtr @ptr
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_productviewmodel_unlink_device(IntPtr @ptr,int @productId,int @deviceId
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1130,10 +1150,6 @@ public static class _UniFFILib {
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr uniffi_stump_fn_method_productviewmodel_update_tags_for_product(IntPtr @ptr,int @productId,RustBuffer @tags
-    );
-
-    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr uniffi_stump_fn_method_productviewmodel_update_traceability_schema(IntPtr @ptr,int @productId,RustBuffer @items
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1218,6 +1234,30 @@ public static class _UniFFILib {
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr uniffi_stump_fn_method_simulatormanager_stop_simulator(IntPtr @ptr,ushort @webPort
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_clone_traceabilityviewmodel(IntPtr @ptr,ref UniffiRustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void uniffi_stump_fn_free_traceabilityviewmodel(IntPtr @ptr,ref UniffiRustCallStatus _uniffi_out_err
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_traceabilityviewmodel_get_by_process_id(IntPtr @ptr,int @productId,RustBuffer @processId
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_traceabilityviewmodel_get_traceability_schema(IntPtr @ptr,int @productId
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_traceabilityviewmodel_query_records(IntPtr @ptr,RustBuffer @query
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr uniffi_stump_fn_method_traceabilityviewmodel_update_traceability_schema(IntPtr @ptr,int @productId,RustBuffer @items
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1565,11 +1605,19 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_launcher_traceability_vm(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort uniffi_stump_checksum_method_launcher_work_order_vm(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort uniffi_stump_checksum_method_manufacturingviewmodel_confirm_step(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_manufacturingviewmodel_get_recent_messages(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1629,11 +1677,15 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern ushort uniffi_stump_checksum_method_productviewmodel_get_traceability_schema(
+    public static extern ushort uniffi_stump_checksum_method_productviewmodel_link_device(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort uniffi_stump_checksum_method_productviewmodel_list_products(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_productviewmodel_unlink_device(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1650,10 +1702,6 @@ public static class _UniFFILib {
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort uniffi_stump_checksum_method_productviewmodel_update_tags_for_product(
-    );
-
-    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern ushort uniffi_stump_checksum_method_productviewmodel_update_traceability_schema(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1721,6 +1769,22 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_traceabilityviewmodel_get_by_process_id(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_traceabilityviewmodel_get_traceability_schema(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_traceabilityviewmodel_query_records(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
+    public static extern ushort uniffi_stump_checksum_method_traceabilityviewmodel_update_traceability_schema(
+    );
+
+    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort uniffi_stump_checksum_method_workorderviewmodel_activate_work_order(
     );
 
@@ -1777,11 +1841,7 @@ public static class _UniFFILib {
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern ushort uniffi_stump_checksum_method_manufacturingobserver_on_status_changed(
-    );
-
-    [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
-    public static extern ushort uniffi_stump_checksum_method_manufacturingobserver_on_message(
+    public static extern ushort uniffi_stump_checksum_method_manufacturingobserver_on_event(
     );
 
     [DllImport("stump", CallingConvention = CallingConvention.Cdecl)]
@@ -1887,6 +1947,12 @@ public static class _UniFFILib {
             }
         }
         {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_launcher_traceability_vm();
+            if (checksum != 17740) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_launcher_traceability_vm` checksum `17740`, library returned `{checksum}`");
+            }
+        }
+        {
             var checksum = _UniFFILib.uniffi_stump_checksum_method_launcher_work_order_vm();
             if (checksum != 41999) {
                 throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_launcher_work_order_vm` checksum `41999`, library returned `{checksum}`");
@@ -1896,6 +1962,12 @@ public static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_stump_checksum_method_manufacturingviewmodel_confirm_step();
             if (checksum != 2957) {
                 throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_manufacturingviewmodel_confirm_step` checksum `2957`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_manufacturingviewmodel_get_recent_messages();
+            if (checksum != 5532) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_manufacturingviewmodel_get_recent_messages` checksum `5532`, library returned `{checksum}`");
             }
         }
         {
@@ -1983,15 +2055,21 @@ public static class _UniFFILib {
             }
         }
         {
-            var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_get_traceability_schema();
-            if (checksum != 51567) {
-                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_get_traceability_schema` checksum `51567`, library returned `{checksum}`");
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_link_device();
+            if (checksum != 42648) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_link_device` checksum `42648`, library returned `{checksum}`");
             }
         }
         {
             var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_list_products();
             if (checksum != 18659) {
                 throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_list_products` checksum `18659`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_unlink_device();
+            if (checksum != 16241) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_unlink_device` checksum `16241`, library returned `{checksum}`");
             }
         }
         {
@@ -2016,12 +2094,6 @@ public static class _UniFFILib {
             var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_update_tags_for_product();
             if (checksum != 64637) {
                 throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_update_tags_for_product` checksum `64637`, library returned `{checksum}`");
-            }
-        }
-        {
-            var checksum = _UniFFILib.uniffi_stump_checksum_method_productviewmodel_update_traceability_schema();
-            if (checksum != 15704) {
-                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_productviewmodel_update_traceability_schema` checksum `15704`, library returned `{checksum}`");
             }
         }
         {
@@ -2121,6 +2193,30 @@ public static class _UniFFILib {
             }
         }
         {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_traceabilityviewmodel_get_by_process_id();
+            if (checksum != 1464) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_traceabilityviewmodel_get_by_process_id` checksum `1464`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_traceabilityviewmodel_get_traceability_schema();
+            if (checksum != 13008) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_traceabilityviewmodel_get_traceability_schema` checksum `13008`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_traceabilityviewmodel_query_records();
+            if (checksum != 41436) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_traceabilityviewmodel_query_records` checksum `41436`, library returned `{checksum}`");
+            }
+        }
+        {
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_traceabilityviewmodel_update_traceability_schema();
+            if (checksum != 7024) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_traceabilityviewmodel_update_traceability_schema` checksum `7024`, library returned `{checksum}`");
+            }
+        }
+        {
             var checksum = _UniFFILib.uniffi_stump_checksum_method_workorderviewmodel_activate_work_order();
             if (checksum != 44285) {
                 throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_workorderviewmodel_activate_work_order` checksum `44285`, library returned `{checksum}`");
@@ -2205,15 +2301,9 @@ public static class _UniFFILib {
             }
         }
         {
-            var checksum = _UniFFILib.uniffi_stump_checksum_method_manufacturingobserver_on_status_changed();
-            if (checksum != 28348) {
-                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_manufacturingobserver_on_status_changed` checksum `28348`, library returned `{checksum}`");
-            }
-        }
-        {
-            var checksum = _UniFFILib.uniffi_stump_checksum_method_manufacturingobserver_on_message();
-            if (checksum != 64751) {
-                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_manufacturingobserver_on_message` checksum `64751`, library returned `{checksum}`");
+            var checksum = _UniFFILib.uniffi_stump_checksum_method_manufacturingobserver_on_event();
+            if (checksum != 13777) {
+                throw new UniffiContractChecksumException($"uniffi.stump: uniffi bindings expected function `uniffi_stump_checksum_method_manufacturingobserver_on_event` checksum `13777`, library returned `{checksum}`");
             }
         }
         {
@@ -2746,6 +2836,7 @@ public interface ILauncher {
     ProductViewModel ProductVm();
     RbacViewModel RbacVm();
     void Stop();
+    TraceabilityViewModel TraceabilityVm();
     WorkOrderViewModel WorkOrderVm();
 }
 public class Launcher : ILauncher, IDisposable {
@@ -2948,6 +3039,14 @@ public class Launcher : ILauncher, IDisposable {
     
     
     
+    public TraceabilityViewModel TraceabilityVm() {
+        return CallWithPointer(thisPtr => FfiConverterTypeTraceabilityViewModel.INSTANCE.Lift(
+    _UniffiHelpers.RustCall( (ref UniffiRustCallStatus _status) =>
+    _UniFFILib.uniffi_stump_fn_method_launcher_traceability_vm(thisPtr,  ref _status)
+)));
+    }
+    
+    
     public WorkOrderViewModel WorkOrderVm() {
         return CallWithPointer(thisPtr => FfiConverterTypeWorkOrderViewModel.INSTANCE.Lift(
     _UniffiHelpers.RustCall( (ref UniffiRustCallStatus _status) =>
@@ -2989,6 +3088,8 @@ public class FfiConverterTypeLauncher: FfiConverter<Launcher, IntPtr> {
 public interface IManufacturingViewModel {
     /// <exception cref="Exception"></exception>
     Task ConfirmStep(int @stepId);
+    /// <exception cref="Exception"></exception>
+    Task<ManufacturingMessage[]> GetRecentMessages();
     /// <exception cref="Exception"></exception>
     Task<ManufacturingStatus> GetStatus();
     StepMetadata[] GetStepTypes();
@@ -3099,6 +3200,28 @@ public class ManufacturingViewModel : IManufacturingViewModel, IDisposable {
         },
         // Free
         (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_void(future),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+    /// <exception cref="Exception"></exception>
+    public async Task<ManufacturingMessage[]> GetRecentMessages() {
+    return await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_manufacturingviewmodel_get_recent_messages(thisPtr);
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_rust_buffer(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {
+            return _UniFFILib.ffi_stump_rust_future_complete_rust_buffer(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
+        // Lift
+        (result) => FfiConverterSequenceTypeManufacturingMessage.INSTANCE.Lift(result),
         // Error
         FfiConverterTypeError.INSTANCE
     );
@@ -3405,9 +3528,11 @@ public interface IProductViewModel {
     /// <exception cref="Exception"></exception>
     Task<PlcTagRecord[]> GetTagsByProduct(int? @productId);
     /// <exception cref="Exception"></exception>
-    Task<TraceabilityItem[]> GetTraceabilitySchema(int @productId);
+    Task LinkDevice(int @productId, int @deviceId);
     /// <exception cref="Exception"></exception>
     Task<Product[]> ListProducts();
+    /// <exception cref="Exception"></exception>
+    Task UnlinkDevice(int @productId, int @deviceId);
     /// <exception cref="Exception"></exception>
     Task UpdateDagByProduct(int @productId, DagFlow @dag);
     /// <exception cref="Exception"></exception>
@@ -3416,8 +3541,6 @@ public interface IProductViewModel {
     Task UpdateTag(PlcTagRecord @record);
     /// <exception cref="Exception"></exception>
     Task UpdateTagsForProduct(int @productId, PlcTagRecord[] @tags);
-    /// <exception cref="Exception"></exception>
-    Task UpdateTraceabilitySchema(int @productId, TraceabilityItem[] @items);
 }
 public class ProductViewModel : IProductViewModel, IDisposable {
     protected IntPtr pointer;
@@ -3655,22 +3778,18 @@ public class ProductViewModel : IProductViewModel, IDisposable {
     }
     
     /// <exception cref="Exception"></exception>
-    public async Task<TraceabilityItem[]> GetTraceabilitySchema(int @productId) {
-    return await _UniFFIAsync.UniffiRustCallAsync(
+    public async Task LinkDevice(int @productId, int @deviceId) {await _UniFFIAsync.UniffiRustCallAsync(
         // Get rust future
         CallWithPointer(thisPtr => {
-            return _UniFFILib.uniffi_stump_fn_method_productviewmodel_get_traceability_schema(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId));
+            return _UniFFILib.uniffi_stump_fn_method_productviewmodel_link_device(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterInt32.INSTANCE.Lower(@deviceId));
         }),
         // Poll
-        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_rust_buffer(future, continuation, data),
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_void(future, continuation, data),
         // Complete
-        (IntPtr future, ref UniffiRustCallStatus status) => {
-            return _UniFFILib.ffi_stump_rust_future_complete_rust_buffer(future, ref status);
+        (IntPtr future, ref UniffiRustCallStatus status) => {_UniFFILib.ffi_stump_rust_future_complete_void(future, ref status);
         },
         // Free
-        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
-        // Lift
-        (result) => FfiConverterSequenceTypeTraceabilityItem.INSTANCE.Lift(result),
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_void(future),
         // Error
         FfiConverterTypeError.INSTANCE
     );
@@ -3693,6 +3812,24 @@ public class ProductViewModel : IProductViewModel, IDisposable {
         (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
         // Lift
         (result) => FfiConverterSequenceTypeProduct.INSTANCE.Lift(result),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+    /// <exception cref="Exception"></exception>
+    public async Task UnlinkDevice(int @productId, int @deviceId) {await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_productviewmodel_unlink_device(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterInt32.INSTANCE.Lower(@deviceId));
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_void(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {_UniFFILib.ffi_stump_rust_future_complete_void(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_void(future),
         // Error
         FfiConverterTypeError.INSTANCE
     );
@@ -3761,24 +3898,6 @@ public class ProductViewModel : IProductViewModel, IDisposable {
         // Get rust future
         CallWithPointer(thisPtr => {
             return _UniFFILib.uniffi_stump_fn_method_productviewmodel_update_tags_for_product(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterSequenceTypePlcTagRecord.INSTANCE.Lower(@tags));
-        }),
-        // Poll
-        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_void(future, continuation, data),
-        // Complete
-        (IntPtr future, ref UniffiRustCallStatus status) => {_UniFFILib.ffi_stump_rust_future_complete_void(future, ref status);
-        },
-        // Free
-        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_void(future),
-        // Error
-        FfiConverterTypeError.INSTANCE
-    );
-    }
-    
-    /// <exception cref="Exception"></exception>
-    public async Task UpdateTraceabilitySchema(int @productId, TraceabilityItem[] @items) {await _UniFFIAsync.UniffiRustCallAsync(
-        // Get rust future
-        CallWithPointer(thisPtr => {
-            return _UniFFILib.uniffi_stump_fn_method_productviewmodel_update_traceability_schema(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterSequenceTypeTraceabilityItem.INSTANCE.Lower(@items));
         }),
         // Poll
         (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_void(future, continuation, data),
@@ -4432,6 +4551,219 @@ public class FfiConverterTypeSimulatorManager: FfiConverter<SimulatorManager, In
     }
 
     public override void Write(SimulatorManager value, BigEndianStream stream) {
+        stream.WriteLong(Lower(value).ToInt64());
+    }
+}
+
+
+
+public interface ITraceabilityViewModel {
+    /// <exception cref="Exception"></exception>
+    Task<string?> GetByProcessId(int @productId, string @processId);
+    /// <exception cref="Exception"></exception>
+    Task<TraceabilityItem[]> GetTraceabilitySchema(int @productId);
+    /// <exception cref="Exception"></exception>
+    Task<string> QueryRecords(TraceQuery @query);
+    /// <exception cref="Exception"></exception>
+    Task UpdateTraceabilitySchema(int @productId, TraceabilityItem[] @items);
+}
+public class TraceabilityViewModel : ITraceabilityViewModel, IDisposable {
+    protected IntPtr pointer;
+    private int _wasDestroyed = 0;
+    private long _callCounter = 1;
+
+    public TraceabilityViewModel(IntPtr pointer) {
+        this.pointer = pointer;
+    }
+
+    ~TraceabilityViewModel() {
+        Destroy();
+    }
+
+    protected void FreeRustArcPtr() {
+        _UniffiHelpers.RustCall((ref UniffiRustCallStatus status) => {
+            _UniFFILib.uniffi_stump_fn_free_traceabilityviewmodel(this.pointer, ref status);
+        });
+    }
+
+    protected IntPtr CloneRustArcPtr() {
+        return _UniffiHelpers.RustCall((ref UniffiRustCallStatus status) => {
+            return _UniFFILib.uniffi_stump_fn_clone_traceabilityviewmodel(this.pointer, ref status);
+        });
+    }
+
+    public void Destroy()
+    {
+        // Only allow a single call to this method.
+        if (Interlocked.CompareExchange(ref _wasDestroyed, 1, 0) == 0)
+        {
+            // This decrement always matches the initial count of 1 given at creation time.
+            if (Interlocked.Decrement(ref _callCounter) == 0)
+            {
+                FreeRustArcPtr();
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        Destroy();
+        GC.SuppressFinalize(this); // Suppress finalization to avoid unnecessary GC overhead.
+    }
+
+    private void IncrementCallCounter() 
+    {
+        // Check and increment the call counter, to keep the object alive.
+        // This needs a compare-and-set retry loop in case of concurrent updates.
+        long count;
+        do
+        {
+            count = Interlocked.Read(ref _callCounter);
+            if (count == 0L) throw new System.ObjectDisposedException(String.Format("'{0}' object has already been destroyed", this.GetType().Name));
+            if (count == long.MaxValue) throw new System.OverflowException(String.Format("'{0}' call counter would overflow", this.GetType().Name));
+
+        } while (Interlocked.CompareExchange(ref _callCounter, count + 1, count) != count);
+    }
+
+    private void DecrementCallCounter() 
+    {
+        // This decrement always matches the increment we performed above.
+        if (Interlocked.Decrement(ref _callCounter) == 0) {
+            FreeRustArcPtr();
+        }
+    }
+
+    public void CallWithPointer(Action<IntPtr> action)
+    {
+        IncrementCallCounter();
+        try {
+            action(CloneRustArcPtr());
+        }
+        finally {
+            DecrementCallCounter();
+        }
+    }
+
+    public T CallWithPointer<T>(Func<IntPtr, T> func)
+    {   
+        IncrementCallCounter();
+        try {
+            return func(CloneRustArcPtr());
+        }
+        finally {
+            DecrementCallCounter();
+        }
+    }
+
+    
+    /// <exception cref="Exception"></exception>
+    public async Task<string?> GetByProcessId(int @productId, string @processId) {
+    return await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_traceabilityviewmodel_get_by_process_id(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterString.INSTANCE.Lower(@processId));
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_rust_buffer(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {
+            return _UniFFILib.ffi_stump_rust_future_complete_rust_buffer(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
+        // Lift
+        (result) => FfiConverterOptionalString.INSTANCE.Lift(result),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+    /// <exception cref="Exception"></exception>
+    public async Task<TraceabilityItem[]> GetTraceabilitySchema(int @productId) {
+    return await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_traceabilityviewmodel_get_traceability_schema(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId));
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_rust_buffer(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {
+            return _UniFFILib.ffi_stump_rust_future_complete_rust_buffer(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
+        // Lift
+        (result) => FfiConverterSequenceTypeTraceabilityItem.INSTANCE.Lift(result),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+    /// <exception cref="Exception"></exception>
+    public async Task<string> QueryRecords(TraceQuery @query) {
+    return await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_traceabilityviewmodel_query_records(thisPtr, FfiConverterTypeTraceQuery.INSTANCE.Lower(@query));
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_rust_buffer(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {
+            return _UniFFILib.ffi_stump_rust_future_complete_rust_buffer(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_rust_buffer(future),
+        // Lift
+        (result) => FfiConverterString.INSTANCE.Lift(result),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+    /// <exception cref="Exception"></exception>
+    public async Task UpdateTraceabilitySchema(int @productId, TraceabilityItem[] @items) {await _UniFFIAsync.UniffiRustCallAsync(
+        // Get rust future
+        CallWithPointer(thisPtr => {
+            return _UniFFILib.uniffi_stump_fn_method_traceabilityviewmodel_update_traceability_schema(thisPtr, FfiConverterInt32.INSTANCE.Lower(@productId), FfiConverterSequenceTypeTraceabilityItem.INSTANCE.Lower(@items));
+        }),
+        // Poll
+        (IntPtr future, IntPtr continuation, IntPtr data) => _UniFFILib.ffi_stump_rust_future_poll_void(future, continuation, data),
+        // Complete
+        (IntPtr future, ref UniffiRustCallStatus status) => {_UniFFILib.ffi_stump_rust_future_complete_void(future, ref status);
+        },
+        // Free
+        (IntPtr future) => _UniFFILib.ffi_stump_rust_future_free_void(future),
+        // Error
+        FfiConverterTypeError.INSTANCE
+    );
+    }
+    
+
+    
+}
+public class FfiConverterTypeTraceabilityViewModel: FfiConverter<TraceabilityViewModel, IntPtr> {
+    public static FfiConverterTypeTraceabilityViewModel INSTANCE = new FfiConverterTypeTraceabilityViewModel();
+
+
+    public override IntPtr Lower(TraceabilityViewModel value) {
+        return value.CallWithPointer(thisPtr => thisPtr);
+    }
+
+    public override TraceabilityViewModel Lift(IntPtr value) {
+        return new TraceabilityViewModel(value);
+    }
+
+    public override TraceabilityViewModel Read(BigEndianStream stream) {
+        return Lift(new IntPtr(stream.ReadLong()));
+    }
+
+    public override int AllocationSize(TraceabilityViewModel value) {
+        return 8;
+    }
+
+    public override void Write(TraceabilityViewModel value, BigEndianStream stream) {
         stream.WriteLong(Lower(value).ToInt64());
     }
 }
@@ -5443,8 +5775,8 @@ public record ManufacturingStatus (
     StepStatus @stepStatus, 
     bool @isRunning, 
     bool @isPaused, 
+    bool @isStale, 
     ManufacturingStats @stats, 
-    ManufacturingMessage[] @messages, 
     Dictionary<string, GenericValue> @variables
 ) {
 }
@@ -5461,8 +5793,8 @@ public class FfiConverterTypeManufacturingStatus: FfiConverterRustBuffer<Manufac
             @stepStatus: FfiConverterTypeStepStatus.INSTANCE.Read(stream),
             @isRunning: FfiConverterBoolean.INSTANCE.Read(stream),
             @isPaused: FfiConverterBoolean.INSTANCE.Read(stream),
+            @isStale: FfiConverterBoolean.INSTANCE.Read(stream),
             @stats: FfiConverterTypeManufacturingStats.INSTANCE.Read(stream),
-            @messages: FfiConverterSequenceTypeManufacturingMessage.INSTANCE.Read(stream),
             @variables: FfiConverterDictionaryStringTypeGenericValue.INSTANCE.Read(stream)
         );
     }
@@ -5476,8 +5808,8 @@ public class FfiConverterTypeManufacturingStatus: FfiConverterRustBuffer<Manufac
             + FfiConverterTypeStepStatus.INSTANCE.AllocationSize(value.@stepStatus)
             + FfiConverterBoolean.INSTANCE.AllocationSize(value.@isRunning)
             + FfiConverterBoolean.INSTANCE.AllocationSize(value.@isPaused)
+            + FfiConverterBoolean.INSTANCE.AllocationSize(value.@isStale)
             + FfiConverterTypeManufacturingStats.INSTANCE.AllocationSize(value.@stats)
-            + FfiConverterSequenceTypeManufacturingMessage.INSTANCE.AllocationSize(value.@messages)
             + FfiConverterDictionaryStringTypeGenericValue.INSTANCE.AllocationSize(value.@variables);
     }
 
@@ -5489,8 +5821,8 @@ public class FfiConverterTypeManufacturingStatus: FfiConverterRustBuffer<Manufac
             FfiConverterTypeStepStatus.INSTANCE.Write(value.@stepStatus, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@isRunning, stream);
             FfiConverterBoolean.INSTANCE.Write(value.@isPaused, stream);
+            FfiConverterBoolean.INSTANCE.Write(value.@isStale, stream);
             FfiConverterTypeManufacturingStats.INSTANCE.Write(value.@stats, stream);
-            FfiConverterSequenceTypeManufacturingMessage.INSTANCE.Write(value.@messages, stream);
             FfiConverterDictionaryStringTypeGenericValue.INSTANCE.Write(value.@variables, stream);
     }
 }
@@ -6624,6 +6956,56 @@ public class FfiConverterTypeStepTypeInfo: FfiConverterRustBuffer<StepTypeInfo> 
 
 
 
+public record TraceQuery (
+    int @productId, 
+    int? @workOrderId, 
+    string? @processId, 
+    long? @startTime, 
+    long? @endTime, 
+    uint @limit, 
+    uint @offset
+) {
+}
+
+public class FfiConverterTypeTraceQuery: FfiConverterRustBuffer<TraceQuery> {
+    public static FfiConverterTypeTraceQuery INSTANCE = new FfiConverterTypeTraceQuery();
+
+    public override TraceQuery Read(BigEndianStream stream) {
+        return new TraceQuery(
+            @productId: FfiConverterInt32.INSTANCE.Read(stream),
+            @workOrderId: FfiConverterOptionalInt32.INSTANCE.Read(stream),
+            @processId: FfiConverterOptionalString.INSTANCE.Read(stream),
+            @startTime: FfiConverterOptionalInt64.INSTANCE.Read(stream),
+            @endTime: FfiConverterOptionalInt64.INSTANCE.Read(stream),
+            @limit: FfiConverterUInt32.INSTANCE.Read(stream),
+            @offset: FfiConverterUInt32.INSTANCE.Read(stream)
+        );
+    }
+
+    public override int AllocationSize(TraceQuery value) {
+        return 0
+            + FfiConverterInt32.INSTANCE.AllocationSize(value.@productId)
+            + FfiConverterOptionalInt32.INSTANCE.AllocationSize(value.@workOrderId)
+            + FfiConverterOptionalString.INSTANCE.AllocationSize(value.@processId)
+            + FfiConverterOptionalInt64.INSTANCE.AllocationSize(value.@startTime)
+            + FfiConverterOptionalInt64.INSTANCE.AllocationSize(value.@endTime)
+            + FfiConverterUInt32.INSTANCE.AllocationSize(value.@limit)
+            + FfiConverterUInt32.INSTANCE.AllocationSize(value.@offset);
+    }
+
+    public override void Write(TraceQuery value, BigEndianStream stream) {
+            FfiConverterInt32.INSTANCE.Write(value.@productId, stream);
+            FfiConverterOptionalInt32.INSTANCE.Write(value.@workOrderId, stream);
+            FfiConverterOptionalString.INSTANCE.Write(value.@processId, stream);
+            FfiConverterOptionalInt64.INSTANCE.Write(value.@startTime, stream);
+            FfiConverterOptionalInt64.INSTANCE.Write(value.@endTime, stream);
+            FfiConverterUInt32.INSTANCE.Write(value.@limit, stream);
+            FfiConverterUInt32.INSTANCE.Write(value.@offset, stream);
+    }
+}
+
+
+
 public record TraceabilityItem (
     int? @id, 
     int @productId, 
@@ -7441,6 +7823,20 @@ public class Exception: UniffiException {
         }
     }
     
+    
+    public class OperationCancelled : Exception {
+        // Members
+        public string @e;
+
+        // Constructor
+        public OperationCancelled(
+                string @e) : base(
+                "@e" + "=" + @e) {
+
+            this.@e = @e;
+        }
+    }
+    
 
     
 }
@@ -7480,6 +7876,9 @@ public class FfiConverterTypeError : FfiConverterRustBuffer<Exception>, CallStat
                     FfiConverterString.INSTANCE.Read(stream));
             case 10:
                 return new Exception.PermissionDeny(
+                    FfiConverterString.INSTANCE.Read(stream));
+            case 11:
+                return new Exception.OperationCancelled(
                     FfiConverterString.INSTANCE.Read(stream));
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeError.Read()", value));
@@ -7528,6 +7927,10 @@ public class FfiConverterTypeError : FfiConverterRustBuffer<Exception>, CallStat
             case Exception.PermissionDeny variant_value:
                 return 4
                     + FfiConverterString.INSTANCE.AllocationSize(variant_value.@e);
+
+            case Exception.OperationCancelled variant_value:
+                return 4
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@e);
             default:
                 throw new InternalException(String.Format("invalid error value '{0}' in FfiConverterTypeError.AllocationSize()", value));
         }
@@ -7573,6 +7976,10 @@ public class FfiConverterTypeError : FfiConverterRustBuffer<Exception>, CallStat
                 break;
             case Exception.PermissionDeny variant_value:
                 stream.WriteInt(10);
+                FfiConverterString.INSTANCE.Write(variant_value.@e, stream);
+                break;
+            case Exception.OperationCancelled variant_value:
+                stream.WriteInt(11);
                 FfiConverterString.INSTANCE.Write(variant_value.@e, stream);
                 break;
             default:
@@ -7688,6 +8095,139 @@ public class FfiConverterTypeGenericValue : FfiConverterRustBuffer<GenericValue>
                 break;
             default:
                 throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeGenericValue.Write()", value));
+        }
+    }
+}
+
+
+
+
+
+
+
+public record ManufacturingEvent {
+    
+    public record Message (
+        ManufacturingMessage @v1
+    ) : ManufacturingEvent {}
+    
+    public record StepChanged (
+        string @stepId
+    ) : ManufacturingEvent {}
+    
+    public record StatsUpdated (
+        int @processedCount,
+        int @scrapCount
+    ) : ManufacturingEvent {}
+    
+    public record TraceabilityRecorded (
+        int @productId,
+        int @workOrderId,
+        string @processId,
+        string @result,
+        string @data
+    ) : ManufacturingEvent {}
+    
+    public record StatusChanged (
+        ManufacturingStatus @v1
+    ) : ManufacturingEvent {}
+    
+
+    
+}
+
+public class FfiConverterTypeManufacturingEvent : FfiConverterRustBuffer<ManufacturingEvent>{
+    public static FfiConverterRustBuffer<ManufacturingEvent> INSTANCE = new FfiConverterTypeManufacturingEvent();
+
+    public override ManufacturingEvent Read(BigEndianStream stream) {
+        var value = stream.ReadInt();
+        switch (value) {
+            case 1:
+                return new ManufacturingEvent.Message(
+                    FfiConverterTypeManufacturingMessage.INSTANCE.Read(stream)
+                );
+            case 2:
+                return new ManufacturingEvent.StepChanged(
+                    FfiConverterString.INSTANCE.Read(stream)
+                );
+            case 3:
+                return new ManufacturingEvent.StatsUpdated(
+                    FfiConverterInt32.INSTANCE.Read(stream),
+                    FfiConverterInt32.INSTANCE.Read(stream)
+                );
+            case 4:
+                return new ManufacturingEvent.TraceabilityRecorded(
+                    FfiConverterInt32.INSTANCE.Read(stream),
+                    FfiConverterInt32.INSTANCE.Read(stream),
+                    FfiConverterString.INSTANCE.Read(stream),
+                    FfiConverterString.INSTANCE.Read(stream),
+                    FfiConverterString.INSTANCE.Read(stream)
+                );
+            case 5:
+                return new ManufacturingEvent.StatusChanged(
+                    FfiConverterTypeManufacturingStatus.INSTANCE.Read(stream)
+                );
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeManufacturingEvent.Read()", value));
+        }
+    }
+
+    public override int AllocationSize(ManufacturingEvent value) {
+        switch (value) {
+            case ManufacturingEvent.Message variant_value:
+                return 4
+                    + FfiConverterTypeManufacturingMessage.INSTANCE.AllocationSize(variant_value.@v1);
+            case ManufacturingEvent.StepChanged variant_value:
+                return 4
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@stepId);
+            case ManufacturingEvent.StatsUpdated variant_value:
+                return 4
+                    + FfiConverterInt32.INSTANCE.AllocationSize(variant_value.@processedCount)
+                    + FfiConverterInt32.INSTANCE.AllocationSize(variant_value.@scrapCount);
+            case ManufacturingEvent.TraceabilityRecorded variant_value:
+                return 4
+                    + FfiConverterInt32.INSTANCE.AllocationSize(variant_value.@productId)
+                    + FfiConverterInt32.INSTANCE.AllocationSize(variant_value.@workOrderId)
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@processId)
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@result)
+                    + FfiConverterString.INSTANCE.AllocationSize(variant_value.@data);
+            case ManufacturingEvent.StatusChanged variant_value:
+                return 4
+                    + FfiConverterTypeManufacturingStatus.INSTANCE.AllocationSize(variant_value.@v1);
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeManufacturingEvent.AllocationSize()", value));
+        }
+    }
+
+    public override void Write(ManufacturingEvent value, BigEndianStream stream) {
+        switch (value) {
+            case ManufacturingEvent.Message variant_value:
+                stream.WriteInt(1);
+                FfiConverterTypeManufacturingMessage.INSTANCE.Write(variant_value.@v1, stream);
+                break;
+            case ManufacturingEvent.StepChanged variant_value:
+                stream.WriteInt(2);
+                FfiConverterString.INSTANCE.Write(variant_value.@stepId, stream);
+                break;
+            case ManufacturingEvent.StatsUpdated variant_value:
+                stream.WriteInt(3);
+                FfiConverterInt32.INSTANCE.Write(variant_value.@processedCount, stream);
+                FfiConverterInt32.INSTANCE.Write(variant_value.@scrapCount, stream);
+                break;
+            case ManufacturingEvent.TraceabilityRecorded variant_value:
+                stream.WriteInt(4);
+                FfiConverterInt32.INSTANCE.Write(variant_value.@productId, stream);
+                FfiConverterInt32.INSTANCE.Write(variant_value.@workOrderId, stream);
+                FfiConverterString.INSTANCE.Write(variant_value.@processId, stream);
+                FfiConverterString.INSTANCE.Write(variant_value.@result, stream);
+                FfiConverterString.INSTANCE.Write(variant_value.@data, stream);
+                break;
+            case ManufacturingEvent.StatusChanged variant_value:
+                stream.WriteInt(5);
+                FfiConverterTypeManufacturingStatus.INSTANCE.Write(variant_value.@v1, stream);
+                break;
+            default:
+                throw new InternalException(String.Format("invalid enum value '{0}' in FfiConverterTypeManufacturingEvent.Write()", value));
         }
     }
 }
@@ -8072,25 +8612,15 @@ public class FfiConverterTypeDeviceObserver: FfiConverter<DeviceObserver, ulong>
 
 
 public interface ManufacturingObserver {
-    void OnStatusChanged(ManufacturingStatus @status);
-    void OnMessage(ManufacturingMessage @message);
+    void OnEvent(ManufacturingEvent @event);
 }
 
 public class UniffiCallbackInterfaceManufacturingObserver {
-    static void OnStatusChanged(ulong @uniffiHandle,RustBuffer @status,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err) {
+    static void OnEvent(ulong @uniffiHandle,RustBuffer @event,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err) {
         var handle = @uniffiHandle;
         if (FfiConverterTypeManufacturingObserver.INSTANCE.handleMap.TryGet(handle, out var uniffiObject)) {
-            uniffiObject.OnStatusChanged(
-                FfiConverterTypeManufacturingStatus.INSTANCE.Lift(@status));
-        } else {
-            throw new InternalException($"No callback in handlemap '{handle}'");
-        }
-    }
-    static void OnMessage(ulong @uniffiHandle,RustBuffer @message,IntPtr @uniffiOutReturn,ref UniffiRustCallStatus _uniffi_out_err) {
-        var handle = @uniffiHandle;
-        if (FfiConverterTypeManufacturingObserver.INSTANCE.handleMap.TryGet(handle, out var uniffiObject)) {
-            uniffiObject.OnMessage(
-                FfiConverterTypeManufacturingMessage.INSTANCE.Lift(@message));
+            uniffiObject.OnEvent(
+                FfiConverterTypeManufacturingEvent.INSTANCE.Lift(@event));
         } else {
             throw new InternalException($"No callback in handlemap '{handle}'");
         }
@@ -8099,13 +8629,11 @@ public class UniffiCallbackInterfaceManufacturingObserver {
     static void UniffiFree(ulong @handle) {
         FfiConverterTypeManufacturingObserver.INSTANCE.handleMap.Remove(@handle);
     }
-    static _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod0 _m0 = new _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod0(OnStatusChanged);
-    static _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod1 _m1 = new _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod1(OnMessage);
+    static _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod0 _m0 = new _UniFFILib.UniffiCallbackInterfaceManufacturingObserverMethod0(OnEvent);
     static _UniFFILib.UniffiCallbackInterfaceFree _callback_interface_free = new _UniFFILib.UniffiCallbackInterfaceFree(UniffiFree);
 
     public static _UniFFILib.UniffiVTableCallbackInterfaceManufacturingObserver _vtable = new _UniFFILib.UniffiVTableCallbackInterfaceManufacturingObserver {
-        @onStatusChanged = Marshal.GetFunctionPointerForDelegate(_m0),
-        @onMessage = Marshal.GetFunctionPointerForDelegate(_m1),
+        @onEvent = Marshal.GetFunctionPointerForDelegate(_m0),
         @uniffiFree = Marshal.GetFunctionPointerForDelegate(_callback_interface_free)
     };
 
@@ -8304,6 +8832,37 @@ public class FfiConverterOptionalUInt64: FfiConverterRustBuffer<ulong?> {
         } else {
             stream.WriteByte(1);
             FfiConverterUInt64.INSTANCE.Write((ulong)value, stream);
+        }
+    }
+}
+
+
+
+
+public class FfiConverterOptionalInt64: FfiConverterRustBuffer<long?> {
+    public static FfiConverterOptionalInt64 INSTANCE = new FfiConverterOptionalInt64();
+
+    public override long? Read(BigEndianStream stream) {
+        if (stream.ReadByte() == 0) {
+            return null;
+        }
+        return FfiConverterInt64.INSTANCE.Read(stream);
+    }
+
+    public override int AllocationSize(long? value) {
+        if (value == null) {
+            return 1;
+        } else {
+            return 1 + FfiConverterInt64.INSTANCE.AllocationSize((long)value);
+        }
+    }
+
+    public override void Write(long? value, BigEndianStream stream) {
+        if (value == null) {
+            stream.WriteByte(0);
+        } else {
+            stream.WriteByte(1);
+            FfiConverterInt64.INSTANCE.Write((long)value, stream);
         }
     }
 }
