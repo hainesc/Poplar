@@ -37,7 +37,10 @@ public partial class DeviceSelectionItem : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    public int id => Device.id;
     public string name => Device.name;
+    public string protocol => Device.protocol?.ToUpper() ?? string.Empty;
+    public string deviceType => Device.deviceType;
 
     public DeviceSelectionItem(DeviceRecord device)
     {

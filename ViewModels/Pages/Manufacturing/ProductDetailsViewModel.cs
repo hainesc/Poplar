@@ -68,6 +68,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         _productId = productId;
         await LoadProductAsync();
+        await LoadHardwareAsync();
         await LoadTagsAsync();
         await LoadTraceabilityAsync();
         await LoadDevicesAsync();

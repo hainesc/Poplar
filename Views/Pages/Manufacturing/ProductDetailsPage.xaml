@@ -24,6 +24,111 @@
         <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <helpers:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter" />
         <helpers:BoolToMappingTextConverter x:Key="BoolToMappingTextConverter" />
+
+        <!-- Premium Device Selection Card Style -->
+        <Style x:Key="DeviceCardCheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="CardBorder"
+                                Width="220"
+                                Height="140"
+                                Margin="0,0,16,16"
+                                CornerRadius="16"
+                                BorderThickness="1.5"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                Padding="16"
+                                Cursor="Hand">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Row 0: Icon Badge & Checkmark -->
+                                <Grid Grid.Row="0">
+                                    <!-- Icon Badge on Left -->
+                                    <Border x:Name="IconBadge"
+                                            Width="36"
+                                            Height="36"
+                                            CornerRadius="10"
+                                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                        <ui:SymbolIcon Symbol="Cpu24" 
+                                                       x:Name="CpuIcon"
+                                                       Filled="False"
+                                                       FontSize="18"
+                                                       Foreground="{DynamicResource AccentFillColorDefaultBrush}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Checkmark on Right -->
+                                    <ui:SymbolIcon x:Name="CheckIcon" 
+                                                   Symbol="CheckmarkCircle24" 
+                                                   Filled="True"
+                                                   FontSize="20"
+                                                   Foreground="{DynamicResource AccentFillColorDefaultBrush}" 
+                                                   HorizontalAlignment="Right" 
+                                                   VerticalAlignment="Center" 
+                                                   Visibility="Collapsed" />
+                                </Grid>
+
+                                <!-- Row 2: Device Info -->
+                                <StackPanel Grid.Row="2" VerticalAlignment="Bottom">
+                                    <TextBlock Text="{Binding name}" 
+                                               FontWeight="Bold" 
+                                               FontSize="15" 
+                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="0,0,0,4" />
+                                    <TextBlock FontSize="10" 
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="{Binding protocol}" />
+                                        <Run Text=" PROTOCOL" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Triggers for hover and selection states -->
+                        <ControlTemplate.Triggers>
+                            <!-- Hover state -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource ControlStrokeColorSecondaryBrush}" />
+                                <Setter TargetName="CardBorder" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </Trigger>
+                            
+                            <!-- Checked state -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="CardBorder" Property="Background" Value="{DynamicResource AccentFillColorTertiaryBrush}" />
+                                <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="IconBadge" Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="CpuIcon" Property="Foreground" Value="White" />
+                                <Setter TargetName="CpuIcon" Property="Filled" Value="True" />
+                            </Trigger>
+                            
+                            <!-- Checked + Hover state -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True" />
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="CardBorder" Property="BorderBrush" Value="{DynamicResource AccentFillColorSecondaryBrush}" />
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid Margin="24">
@@ -68,16 +173,21 @@
                         <TextBlock FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Select which devices are responsible for manufacturing this product." Margin="0,4,0,0"/>
                     </StackPanel>
 
-                    <ui:ListView 
-                        Grid.Row="1"
-                        ItemsSource="{Binding ViewModel.AvailableDevices}"
-                        SelectionMode="Multiple">
-                        <ui:ListView.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:DeviceSelectionItem}">
-                                <CheckBox Content="{Binding name}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,4"/>
-                            </DataTemplate>
-                        </ui:ListView.ItemTemplate>
-                    </ui:ListView>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding ViewModel.AvailableDevices}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:DeviceSelectionItem}">
+                                    <CheckBox Style="{StaticResource DeviceCardCheckBoxStyle}" 
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
                     <ui:Button Grid.Row="2" 
                                Appearance="Primary" 
