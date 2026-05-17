@@ -12,6 +12,7 @@ public sealed class BackendService : IDisposable
     private RbacViewModel? _rbacVm;
     private DeviceViewModel? _deviceVm;
     private ProductViewModel? _productVm;
+    private TraceabilityViewModel? _traceabilityVm;
     private ManufacturingViewModel? _manufacturingVm;
     private bool _isInitialized;
     private readonly SemaphoreSlim _initLock = new(1, 1);
@@ -37,6 +38,12 @@ public sealed class BackendService : IDisposable
     /// The Product ViewModel for product and process configuration.
     /// </summary>
     public ProductViewModel ProductVm => _productVm
+        ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
+
+    /// <summary>
+    /// The Traceability ViewModel for traceability operations.
+    /// </summary>
+    public TraceabilityViewModel TraceabilityVm => _traceabilityVm
         ?? throw new InvalidOperationException("Backend not initialized. Call InitializeAsync first.");
 
     /// <summary>
@@ -69,6 +76,7 @@ public sealed class BackendService : IDisposable
             _rbacVm = _launcher.RbacVm();
             _deviceVm = _launcher.DeviceManager();
             _productVm = _launcher.ProductVm();
+            _traceabilityVm = _launcher.TraceabilityVm();
             _manufacturingVm = _launcher.ManufacturingVm();
 
             _isInitialized = true;
@@ -85,6 +93,7 @@ public sealed class BackendService : IDisposable
         _rbacVm?.Dispose();
         _deviceVm?.Dispose();
         _productVm?.Dispose();
+        _traceabilityVm?.Dispose();
         _launcher?.Dispose();
         _initLock.Dispose();
     }
