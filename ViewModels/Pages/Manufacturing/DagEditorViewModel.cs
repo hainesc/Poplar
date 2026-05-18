@@ -257,7 +257,7 @@ public partial class DagEditorViewModel : ObservableObject
             var source = sourceObj as FlowNodeViewModel;
             var target = targetObj as FlowNodeViewModel;
 
-            string castMsg = $"[CreateConnection] Source cast: {source?.Id ?? "null"}, Target cast: {target?.Id ?? "null"}";
+            string castMsg = $"[CreateConnection] Source cast: {source?.Id ?? "null"} (OutputAnchor: {source?.OutputAnchor}), Target cast: {target?.Id ?? "null"} (InputAnchor: {target?.InputAnchor})";
             System.Diagnostics.Debug.WriteLine(castMsg);
             System.IO.File.AppendAllText(logPath, castMsg + "\r\n");
 
