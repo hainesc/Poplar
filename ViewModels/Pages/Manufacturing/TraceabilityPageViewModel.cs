@@ -26,13 +26,15 @@ public class CategoryBarItem
 public partial class TraceabilityPageViewModel : ObservableObject
 {
     private readonly ProductService _productService;
+    private readonly WorkOrderService _workOrderService;
     private readonly ManufacturingService _manufacturingService;
     private readonly BackendService _backend;
 
     [ObservableProperty] private ObservableCollection<Product> _products = new();
     [ObservableProperty] private Product? _selectedProduct;
 
-    [ObservableProperty] private int? _workOrderId;
+    [ObservableProperty] private ObservableCollection<WorkOrder> _workOrders = new();
+    [ObservableProperty] private WorkOrder? _selectedWorkOrder;
     [ObservableProperty] private string? _processId;
 
     [ObservableProperty] private DateTime _startTime = DateTime.Now.AddDays(-1);
@@ -79,10 +81,12 @@ public partial class TraceabilityPageViewModel : ObservableObject
 
     public TraceabilityPageViewModel(
         ProductService productService,
+        WorkOrderService workOrderService,
         ManufacturingService manufacturingService,
         BackendService backend)
     {
         _productService = productService;
+        _workOrderService = workOrderService;
         _manufacturingService = manufacturingService;
         _backend = backend;
     }
@@ -105,6 +109,12 @@ public partial class TraceabilityPageViewModel : ObservableObject
             {
                 SelectedProduct = Products[0];
             }
+
+            var workOrderList = await _workOrderService.GetWorkOrdersAsync();
+            var allList = new List<WorkOrder> { new WorkOrder(-1, "All Work Orders", 0, 0, WorkOrderStatus.Pending, 0, 0, "", "") };
+            allList.AddRange(workOrderList);
+            WorkOrders = new ObservableCollection<WorkOrder>(allList);
+            SelectedWorkOrder = WorkOrders[0];
         }
         catch (System.Exception ex)
         {
@@ -136,6 +146,7 @@ public partial class TraceabilityPageViewModel : ObservableObject
         try
         {
             int targetProductId = SelectedProduct.id;
+            int? queryWorkOrderId = (SelectedWorkOrder == null || SelectedWorkOrder.id == -1) ? null : SelectedWorkOrder.id;
 
             // 1. Gather all "Hot" records from the authoritative queue in ManufacturingService
             var hotRecords = _manufacturingService.GetHotTraceRecords()
@@ -152,7 +163,7 @@ public partial class TraceabilityPageViewModel : ObservableObject
                 {
                     var ts = new DateTimeOffset(dt).ToUnixTimeMilliseconds();
                     bool timeOk = ts >= startTs && ts <= endTs;
-                    bool woOk = !WorkOrderId.HasValue || r.WorkOrderId == WorkOrderId.Value;
+                    bool woOk = !queryWorkOrderId.HasValue || r.WorkOrderId == queryWorkOrderId.Value;
                     bool procOk = string.IsNullOrEmpty(ProcessId) || r.ProcessId.Contains(ProcessId, StringComparison.OrdinalIgnoreCase);
                     return timeOk && woOk && procOk;
                 }
@@ -171,7 +182,7 @@ public partial class TraceabilityPageViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine("[TraceabilityVM] Querying cold database via FFI...");
                 var query = new TraceQuery(
                     targetProductId,
-                    WorkOrderId,
+                    queryWorkOrderId,
                     ProcessId,
                     startTs / 1000,
                     endTs / 1000,

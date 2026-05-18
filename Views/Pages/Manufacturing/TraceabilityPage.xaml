@@ -63,12 +63,12 @@
                                       DisplayMemberPath="name" />
                         </StackPanel>
 
-                        <!-- Work Order ID Filter -->
+                        <!-- Work Order Filter -->
                         <StackPanel Margin="0,0,0,16">
-                            <TextBlock Text="Work Order ID" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
-                            <ui:TextBox Text="{Binding ViewModel.WorkOrderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        PlaceholderText="Enter WO ID..."
-                                        ClearButtonEnabled="True" />
+                            <TextBlock Text="Work Order" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <ComboBox ItemsSource="{Binding ViewModel.WorkOrders}"
+                                      SelectedItem="{Binding ViewModel.SelectedWorkOrder, Mode=TwoWay}"
+                                      DisplayMemberPath="title" />
                         </StackPanel>
 
                         <!-- Process ID / Barcode Filter -->
