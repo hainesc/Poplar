@@ -149,7 +149,9 @@ public partial class StepParamViewModel : ObservableObject
         Name = info.name;
         DataType = info.dataType;
         ParamType = info.paramType.ToString();
-        Type = info.paramType.ToString(); // Backwards compatibility for GenericValueHelper wrap
+        // Use the actual parameter data type if it is a standard parameter,
+        // but fallback to plcaddress to preserve address input formatting.
+        Type = info.paramType == uniffi.stump.ParamType.PlcAddress ? "plcaddress" : info.dataType;
         Description = info.description;
     }
 }
