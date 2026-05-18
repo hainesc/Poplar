@@ -42,7 +42,13 @@ public partial class MainWindowViewModel : ViewModel
         new NavigationViewItem("Products", SymbolRegular.Box24, typeof(Poplar.Views.Pages.Manufacturing.ProductsPage)),
         new NavigationViewItem("Devices", SymbolRegular.SpeakerSettings24, typeof(Poplar.Views.Pages.Manufacturing.DevicesPage)),
         new NavigationViewItem("Work Orders", SymbolRegular.Clipboard24, typeof(Poplar.Views.Pages.Manufacturing.WorkOrdersPage)),
-        new NavigationViewItem("Runtime", SymbolRegular.Play24, typeof(Poplar.Views.Pages.Manufacturing.RuntimePage)),
+        new NavigationViewItem("Runtime", SymbolRegular.Play24, typeof(Poplar.Views.Pages.Manufacturing.RuntimePage))
+        {
+            MenuItemsSource = new object[]
+            {
+                new NavigationViewItem("Traceability", SymbolRegular.Fingerprint24, typeof(Poplar.Views.Pages.Manufacturing.TraceabilityPage)),
+            }
+        },
     ];
 
     [ObservableProperty]

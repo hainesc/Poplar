@@ -1,0 +1,633 @@
+<Page
+    x:Class="Poplar.Views.Pages.Manufacturing.TraceabilityPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:helpers="clr-namespace:Poplar.Helpers"
+    xmlns:local="clr-namespace:Poplar.Views.Pages.Manufacturing"
+    xmlns:vm="clr-namespace:Poplar.ViewModels.Pages.Manufacturing"
+    Title="Traceability Intelligence"
+    d:DataContext="{d:DesignInstance local:TraceabilityPage, IsDesignTimeCreatable=False}"
+    d:DesignHeight="768"
+    d:DesignWidth="1024"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <helpers:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        
+        <!-- Premium Neon Shadows for Cards -->
+        <DropShadowEffect x:Key="GoldenGlow" Color="#C5A059" BlurRadius="12" ShadowDepth="0" Opacity="0.2" />
+        <DropShadowEffect x:Key="EmeraldGlow" Color="#10B981" BlurRadius="12" ShadowDepth="0" Opacity="0.2" />
+        <DropShadowEffect x:Key="RoseGlow" Color="#F43F5E" BlurRadius="12" ShadowDepth="0" Opacity="0.2" />
+    </Page.Resources>
+
+    <Grid Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+        <Grid.ColumnDefinitions>
+            <!-- 0. Left Filter Sidebar -->
+            <ColumnDefinition Width="260" />
+            <!-- 1. Right Main Panel -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ==================== LEFT FILTER SIDEBAR ==================== -->
+        <Border Grid.Column="0" 
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" 
+                BorderThickness="0,0,1,0" 
+                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" 
+                Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Sidebar Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,24">
+                    <TextBlock Text="FILTERS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <Separator Margin="0,8,0,0" Height="1" Background="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                </StackPanel>
+
+                <!-- Scrollable Filter Controls -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <!-- Product Selection -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Product" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <ComboBox ItemsSource="{Binding ViewModel.Products}"
+                                      SelectedItem="{Binding ViewModel.SelectedProduct, Mode=TwoWay}"
+                                      DisplayMemberPath="Name" />
+                        </StackPanel>
+
+                        <!-- Work Order ID Filter -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Work Order ID" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <ui:TextBox Text="{Binding ViewModel.WorkOrderId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="Enter WO ID..."
+                                        ClearButtonEnabled="True" />
+                        </StackPanel>
+
+                        <!-- Process ID / Barcode Filter -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Process ID / Barcode" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <ui:TextBox Text="{Binding ViewModel.ProcessId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        PlaceholderText="Enter Process ID..."
+                                        ClearButtonEnabled="True" />
+                        </StackPanel>
+
+                        <!-- Time Window - From -->
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="From Time" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <DatePicker SelectedDate="{Binding ViewModel.StartTime, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <!-- Time Window - To -->
+                        <StackPanel Margin="0,0,0,0">
+                            <TextBlock Text="To Time" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <DatePicker SelectedDate="{Binding ViewModel.EndTime, Mode=TwoWay}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Apply Button -->
+                <StackPanel Grid.Row="2" Margin="0,16,0,0">
+                    <ui:Button Content="Apply Filters" 
+                               Icon="{ui:SymbolIcon Filter24}"
+                               Command="{Binding ViewModel.LoadRecordsCommand}"
+                               Appearance="Primary"
+                               HorizontalAlignment="Stretch"
+                               Height="36" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ==================== RIGHT MAIN PANEL ==================== -->
+        <Grid Grid.Column="1" Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Header Title & Actions -->
+                <RowDefinition Height="*" />    <!-- Main Content Area -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header Title & Actions -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Traceability Intelligence" FontSize="24" FontWeight="Bold" />
+                    <TextBlock Text="Continuous quality audit trail, yield tracking and parametric analytics" 
+                               FontSize="12" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,4,0,0" />
+                </StackPanel>
+
+                <!-- View Mode / Toggle Actions -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Table View Toggle Button -->
+                    <ui:Button Icon="{ui:SymbolIcon Table24}" 
+                               Command="{Binding ViewModel.LoadRecordsCommand}"
+                               ToolTip="Refresh Log"
+                               Appearance="Secondary"
+                               Margin="0,0,8,0" />
+
+                    <!-- Toggle Spreadsheet/Grid View -->
+                    <Border BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="6" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" Padding="2">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Content="Table" 
+                                       Command="{Binding ViewModel.LoadRecordsCommand}" 
+                                       CommandParameter="table"
+                                       Appearance="{Binding ViewModel.IsTableView, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Primary}"
+                                       Padding="8,4" 
+                                       FontSize="11" />
+                            <ui:Button Content="Cards" 
+                                       Command="{Binding ViewModel.LoadRecordsCommand}"
+                                       CommandParameter="grid"
+                                       Padding="8,4" 
+                                       FontSize="11" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- 2. Main Scrollable Workspace -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <!-- ==================== SUMMARY KPI CARDS ==================== -->
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Total Samples Card -->
+                        <ui:Card Grid.Column="0" Margin="0,0,12,0" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="Total Audited" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="{Binding ViewModel.TotalCount}" FontSize="28" FontWeight="Bold" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </ui:Card>
+
+                        <!-- Yield Rate Card -->
+                        <ui:Card Grid.Column="1" Margin="6,0,6,0" Padding="16" Effect="{StaticResource EmeraldGlow}">
+                            <StackPanel>
+                                <TextBlock Text="Yield Rate" FontSize="11" FontWeight="SemiBold" Foreground="#10B981" />
+                                <TextBlock Text="{Binding ViewModel.YieldRate, StringFormat={}{0:F2}%}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </ui:Card>
+
+                        <!-- OK Samples Card -->
+                        <ui:Card Grid.Column="2" Margin="6,0,6,0" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="OK Samples" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="{Binding ViewModel.OkCount}" FontSize="28" FontWeight="Bold" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </ui:Card>
+
+                        <!-- NG Samples Card -->
+                        <ui:Card Grid.Column="3" Margin="12,0,0,0" Padding="16" Effect="{StaticResource RoseGlow}">
+                            <StackPanel>
+                                <TextBlock Text="NG Samples" FontSize="11" FontWeight="SemiBold" Foreground="#F43F5E" />
+                                <TextBlock Text="{Binding ViewModel.NgCount}" FontSize="28" FontWeight="Bold" Foreground="#F43F5E" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </ui:Card>
+                    </Grid>
+
+                    <!-- ==================== LIVE VECTOR CHARTS SECTION ==================== -->
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="280" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Throughput Density Chart -->
+                        <ui:Card Grid.Column="0" Margin="0,0,12,0" Padding="16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                    <TextBlock Text="Throughput Density" FontSize="13" FontWeight="Bold" />
+                                    <TextBlock Text="Processed parts in the last 24h" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+
+                                <!-- Custom SVG Area Path rendering -->
+                                <Grid Grid.Row="1" Height="140" Background="#0A0A0A" ClipToBounds="True">
+                                    <Path Data="{Binding ViewModel.ThroughputAreaPathData}" Stretch="Fill">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#30C5A059" Offset="0" />
+                                                <GradientStop Color="#00C5A059" Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <Path Data="{Binding ViewModel.ThroughputLinePathData}" Stroke="#C5A059" StrokeThickness="2" Stretch="Fill" />
+                                </Grid>
+                            </Grid>
+                        </ui:Card>
+
+                        <!-- Parametric Trend Chart -->
+                        <ui:Card Grid.Column="1" Margin="6,0,6,0" Padding="16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Parametric Trend" FontSize="13" FontWeight="Bold" />
+                                        <TextBlock Text="Parameter measurements over time" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+
+                                    <!-- Dropdown for dynamic key metric selection -->
+                                    <ComboBox Grid.Column="1" 
+                                              ItemsSource="{Binding ViewModel.AvailableMetrics}"
+                                              SelectedItem="{Binding ViewModel.SelectedMetric, Mode=TwoWay}"
+                                              Width="140" 
+                                              Height="24"
+                                              FontSize="10" />
+                                </Grid>
+
+                                <!-- Custom SVG Parametric Line Rendering -->
+                                <Grid Grid.Row="1" Height="140" Background="#0A0A0A" ClipToBounds="True">
+                                    <Path Data="{Binding ViewModel.MetricAreaPathData}" Stretch="Fill">
+                                        <Path.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#3010B981" Offset="0" />
+                                                <GradientStop Color="#0010B981" Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Path.Fill>
+                                    </Path>
+                                    <Path Data="{Binding ViewModel.MetricLinePathData}" Stroke="#10B981" StrokeThickness="2" Stretch="Fill" />
+
+                                    <!-- NG Marker Ellipses -->
+                                    <ItemsControl ItemsSource="{Binding ViewModel.MetricNgPoints}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas Width="400" Height="150" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                                <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Ellipse Width="8" Height="8" Fill="#F43F5E" Margin="-4,-4,0,0" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Grid>
+                        </ui:Card>
+
+                        <!-- Categorical Stacked Bar -->
+                        <ui:Card Grid.Column="2" Margin="6,0,0,0" Padding="16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Insights" FontSize="13" FontWeight="Bold" />
+                                        <TextBlock Text="Categorical distribution" FontSize="11" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+
+                                    <ComboBox Grid.Column="1" 
+                                              ItemsSource="{Binding ViewModel.AvailableCategories}"
+                                              SelectedItem="{Binding ViewModel.SelectedCategory, Mode=TwoWay}"
+                                              Width="110" 
+                                              Height="24"
+                                              FontSize="10" />
+                                </Grid>
+
+                                <!-- Stacked horizontal progress indicators -->
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding ViewModel.CategoryBars}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:CategoryBarItem}">
+                                            <Grid Margin="0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="65" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="10" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <!-- OK stacked segment -->
+                                                    <Border Height="8" CornerRadius="4,0,0,4" Background="#10B981" Width="{Binding OkWidth}" ToolTip="{Binding OkCount}" />
+                                                    <!-- NG stacked segment -->
+                                                    <Border Height="8" CornerRadius="0,4,4,0" Background="#F43F5E" Width="{Binding NgWidth}" ToolTip="{Binding NgCount}" />
+                                                    
+                                                    <TextBlock Text="{Binding TotalCount}" FontSize="9" Margin="6,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </ui:Card>
+                    </Grid>
+
+                    <!-- ==================== MAIN AUDIT RECORDS ==================== -->
+                    <StackPanel>
+                        <TextBlock Text="Audit Records" FontSize="18" FontWeight="Bold" Margin="0,0,0,12" />
+
+                        <!-- Switchable Grid Spreadsheet -->
+                        <Grid>
+                            <!-- Mode 1: Table Spreadsheet View -->
+                            <DataGrid AutoGenerateColumns="False" 
+                                      HeadersVisibility="Column" 
+                                      GridLinesVisibility="Horizontal"
+                                      IsReadOnly="True"
+                                      ItemsSource="{Binding ViewModel.Records}"
+                                      SelectedItem="{Binding ViewModel.SelectedRecord, Mode=TwoWay}"
+                                      Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+                                      BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                      BorderThickness="1"
+                                      RowHeight="38"
+                                      Padding="8"
+                                      Visibility="{Binding ViewModel.IsTableView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <DataGrid.Columns>
+                                    <!-- Process ID -->
+                                    <DataGridTextColumn Header="Process ID / Barcode" 
+                                                        Binding="{Binding ProcessId}" 
+                                                        Width="180" 
+                                                        FontFamily="Consolas" 
+                                                        FontWeight="Bold" />
+
+                                    <!-- Status / Result -->
+                                    <DataGridTemplateColumn Header="Result" Width="90">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="10" Padding="8,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                    <Setter Property="Background" Value="#1510B981" />
+                                                                    <Setter Property="BorderBrush" Value="#4010B981" />
+                                                                    <Setter Property="BorderThickness" Value="1" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Result}" Value="ng">
+                                                                    <Setter Property="Background" Value="#15F43F5E" />
+                                                                    <Setter Property="BorderBrush" Value="#40F43F5E" />
+                                                                    <Setter Property="BorderThickness" Value="1" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Text="{Binding Result, Converter={StaticResource StringToValueConverter}, ConverterParameter=ToUpper}" 
+                                                               FontSize="9" 
+                                                               FontWeight="Bold"
+                                                               VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                        <Setter Property="Foreground" Value="#10B981" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Result}" Value="ng">
+                                                                        <Setter Property="Foreground" Value="#F43F5E" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <!-- Timestamp -->
+                                    <DataGridTextColumn Header="Timestamp" Binding="{Binding CreatedAt}" Width="150" />
+
+                                    <!-- Work Order ID -->
+                                    <DataGridTextColumn Header="Work Order #" Binding="{Binding WorkOrderId}" Width="100" />
+
+                                    <!-- Raw JSON data preview -->
+                                    <DataGridTextColumn Header="Payload Snippet" Binding="{Binding Data}" Width="*" FontFamily="Consolas" FontSize="10" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Mode 2: Gorgeous Grid Cards View -->
+                            <ItemsControl ItemsSource="{Binding ViewModel.Records}"
+                                          Visibility="{Binding ViewModel.IsGridView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:Card Width="230" Margin="0,0,16,16" Padding="12" Cursor="Hand">
+                                            <ui:Card.InputBindings>
+                                                <MouseBinding Gesture="LeftClick" 
+                                                              Command="{Binding DataContext.ViewModel.SelectRecordCommand, RelativeSource={RelativeSource AncestorType=local:TraceabilityPage}}"
+                                                              CommandParameter="{Binding}" />
+                                            </ui:Card.InputBindings>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Header: Icon & Result Badge -->
+                                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <ui:SymbolIcon Symbol="Fingerprint24" Filled="True" Foreground="#C5A059" VerticalAlignment="Center" Grid.Column="0" HorizontalAlignment="Left" />
+
+                                                    <Border Grid.Column="1" CornerRadius="10" Padding="6,2" BorderThickness="1">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                        <Setter Property="Background" Value="#1510B981" />
+                                                                        <Setter Property="BorderBrush" Value="#4010B981" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Result}" Value="ng">
+                                                                        <Setter Property="Background" Value="#15F43F5E" />
+                                                                        <Setter Property="BorderBrush" Value="#40F43F5E" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+                                                        <TextBlock Text="{Binding Result, Converter={StaticResource StringToValueConverter}, ConverterParameter=ToUpper}" FontSize="9" FontWeight="Bold">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Result}" Value="ok">
+                                                                            <Setter Property="Foreground" Value="#10B981" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Result}" Value="ng">
+                                                                            <Setter Property="Foreground" Value="#F43F5E" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Border>
+                                                </Grid>
+
+                                                <!-- Title -->
+                                                <StackPanel Grid.Row="1" Margin="0,0,0,8">
+                                                    <TextBlock Text="{Binding ProcessId}" FontSize="13" FontWeight="Bold" FontFamily="Consolas" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding WorkOrderId, StringFormat='Work Order #{0}'}" FontSize="10" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+
+                                                <!-- Snippet -->
+                                                <Border Grid.Row="2" CornerRadius="6" Background="#0A0A0A" Padding="8" MaxHeight="80" VerticalAlignment="Stretch">
+                                                    <TextBlock Text="{Binding Data}" FontSize="9" FontFamily="Consolas" TextWrapping="Wrap" Foreground="#A0A0A0" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+
+                                                <!-- Footer -->
+                                                <TextBlock Grid.Row="3" Text="{Binding CreatedAt}" FontSize="9" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,8,0,0" />
+                                            </Grid>
+                                        </ui:Card>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ==================== SLIDING DETAILS SIDE DRAWER ==================== -->
+        <Border Grid.Column="0" Grid.ColumnSpan="2" 
+                HorizontalAlignment="Right" 
+                Width="420" 
+                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}" 
+                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" 
+                BorderThickness="1,0,0,0" 
+                Visibility="{Binding ViewModel.SelectedRecord, Converter={StaticResource NullToVisibilityConverter}}"
+                Panel.ZIndex="100">
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> <!-- Drawer Header -->
+                    <RowDefinition Height="*" />    <!-- Drawer Content Scroll -->
+                    <RowDefinition Height="Auto" /> <!-- Drawer Footer Close Button -->
+                </Grid.RowDefinitions>
+
+                <!-- Drawer Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Audit Trace Detail" FontSize="16" FontWeight="Bold" />
+                        <TextBlock Text="{Binding ViewModel.SelectedRecord.ProcessId}" FontSize="12" FontFamily="Consolas" FontWeight="SemiBold" Foreground="#C5A059" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <ui:Button Grid.Column="1" 
+                               Icon="{ui:SymbolIcon Dismiss24}" 
+                               Command="{Binding ViewModel.LoadRecordsCommand}"
+                               CommandParameter="close_drawer"
+                               Appearance="Secondary"
+                               VerticalAlignment="Top" />
+                </Grid>
+
+                <!-- Drawer Content -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <!-- Stat block -->
+                        <ui:Card Padding="16" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,12">
+                                    <TextBlock Text="Work Order" FontSize="10" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding ViewModel.SelectedRecord.WorkOrderId, StringFormat='#{0}'}" FontSize="14" FontWeight="Bold" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,12">
+                                    <TextBlock Text="Recorded At" FontSize="10" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding ViewModel.SelectedRecord.CreatedAt}" FontSize="12" FontWeight="SemiBold" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0">
+                                    <TextBlock Text="Result Status" FontSize="10" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding ViewModel.SelectedRecord.Result, Converter={StaticResource StringToValueConverter}, ConverterParameter=ToUpper}" FontSize="14" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ViewModel.SelectedRecord.Result}" Value="ok">
+                                                        <Setter Property="Foreground" Value="#10B981" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding ViewModel.SelectedRecord.Result}" Value="ng">
+                                                        <Setter Property="Foreground" Value="#F43F5E" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </ui:Card>
+
+                        <!-- Syntax JSON display -->
+                        <StackPanel Margin="0,0,0,6">
+                            <TextBlock Text="Full JSON Payload" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
+                            <TextBox Text="{Binding ViewModel.SelectedRecord.Data, Mode=OneWay}"
+                                     TextWrapping="Wrap" 
+                                     AcceptsReturn="True" 
+                                     IsReadOnly="True" 
+                                     FontFamily="Consolas" 
+                                     FontSize="10" 
+                                     Height="320" 
+                                     Background="#0A0A0A" 
+                                     BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Drawer Close Button -->
+                <ui:Button Grid.Row="2" 
+                           Content="Close Drawer" 
+                           Command="{Binding ViewModel.LoadRecordsCommand}"
+                           CommandParameter="close_drawer"
+                           HorizontalAlignment="Stretch"
+                           Height="36" 
+                           Margin="0,16,0,0" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

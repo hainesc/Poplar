@@ -70,6 +70,8 @@ public partial class App
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.WorkOrdersViewModel>();
                 _ = services.AddSingleton<Poplar.Views.Pages.Manufacturing.RuntimePage>();
                 _ = services.AddSingleton<Poplar.ViewModels.Pages.Manufacturing.RuntimeViewModel>();
+                _ = services.AddTransient<Poplar.Views.Pages.Manufacturing.TraceabilityPage>();
+                _ = services.AddTransient<Poplar.ViewModels.Pages.Manufacturing.TraceabilityPageViewModel>();
 
                 // All other pages and view models
                 _ = services.AddTransientFromNamespace("Poplar.Views", GalleryAssembly.Asssembly);
