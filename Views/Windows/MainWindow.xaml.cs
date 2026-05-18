@@ -107,7 +107,7 @@ public partial class MainWindow : IWindow
 
         ShowAndActivateWindow();
 
-        NavigateToPage(typeof(DashboardPage));
+        NavigateToPage(typeof(Poplar.Views.Pages.Manufacturing.ProductsPage));
     }
 
     private void HandleTraySettingsClick()
@@ -183,7 +183,7 @@ public partial class MainWindow : IWindow
                 AuthFrame.Visibility = Visibility.Collapsed;
                 AuthFrame.Content = null;
 
-                NavigateToPage(typeof(DashboardPage));
+                NavigateToPage(typeof(Poplar.Views.Pages.Manufacturing.ProductsPage));
             }
             else
             {
@@ -218,7 +218,7 @@ public partial class MainWindow : IWindow
         }
 
         var targetPage = navigationView.SelectedItem?.TargetPageType;
-        var hideHeader = targetPage == typeof(DashboardPage) || targetPage == typeof(LoginPage);
+        var hideHeader = targetPage == typeof(LoginPage);
 
         NavigationView.SetCurrentValue(
             NavigationView.HeaderVisibilityProperty,

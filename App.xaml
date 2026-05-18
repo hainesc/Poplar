@@ -16,13 +16,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
-
-                <syntax:SyntaxHighlightDictionary />
-
-                <ResourceDictionary Source="Controls/GalleryNavigationPresenter.xaml" />
-                <ResourceDictionary Source="Controls/ControlExample.xaml" />
-                <ResourceDictionary Source="Controls/TypographyControl.xaml" />
-                <ResourceDictionary Source="Controls/PageControlDocumentation.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Premium Color Palette Brushes -->

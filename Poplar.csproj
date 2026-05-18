@@ -38,14 +38,9 @@
   <ItemGroup>
     <Resource Include="Assets\geo_icons.png" />
     <Resource Include="Assets\octonaut.jpg" />
-    <Resource Include="Assets\pexels-johannes-plenio-1103970.jpg" />
-    <Resource Include="Assets\WinUiGallery\Button.png" />
-    <Resource Include="Assets\WinUiGallery\Flyout.png" />
-    <Resource Include="Assets\WinUiGallery\MenuBar.png" />
     <Resource Include="Assets\user_avatar.png" />
     <Resource Include="Assets\wpfui.png" />
     <Resource Include="Assets\wpfui_full.png" />
-    <Resource Include="CodeSamples\Typography\TypographySample_xaml.txt" />
     <Resource Include="Libs\Wpf.Ui.SyntaxHighlight\Fonts\FiraCode-Regular.ttf" />
   </ItemGroup>
 

@@ -56,10 +56,6 @@ public partial class App
                 // Top-level pages
                 _ = services.AddSingleton<LoginPage>();
                 _ = services.AddSingleton<LoginViewModel>();
-                _ = services.AddSingleton<DashboardPage>();
-                _ = services.AddSingleton<DashboardViewModel>();
-                _ = services.AddSingleton<AllControlsPage>();
-                _ = services.AddSingleton<AllControlsViewModel>();
                 _ = services.AddSingleton<SettingsPage>();
                 _ = services.AddSingleton<SettingsViewModel>();
                 _ = services.AddSingleton<Poplar.Views.Pages.Manufacturing.DevicesPage>();
