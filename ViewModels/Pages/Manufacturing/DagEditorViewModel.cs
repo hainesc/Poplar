@@ -45,6 +45,10 @@ public partial class DagEditorViewModel : ObservableObject
     [ObservableProperty] private Point _pendingConnectionSource;
     [ObservableProperty] private bool _isConnecting;
 
+    // Viewport control properties
+    [ObservableProperty] private double _zoom = 1.0;
+    [ObservableProperty] private Point _viewportLocation = new Point(0, 0);
+
     public void Initialize(StepMetadata[] metadata)
     {
         _stepMetadata = metadata;
@@ -177,6 +181,46 @@ public partial class DagEditorViewModel : ObservableObject
             Connections.Remove(conn);
             SelectedItem = null;
         }
+    }
+
+    [RelayCommand]
+    private void ZoomIn()
+    {
+        Zoom = Math.Min(2.0, Zoom + 0.1);
+    }
+
+    [RelayCommand]
+    private void ZoomOut()
+    {
+        Zoom = Math.Max(0.2, Zoom - 0.1);
+    }
+
+    [RelayCommand]
+    private void ZoomReset()
+    {
+        Zoom = 1.0;
+    }
+
+    [RelayCommand]
+    private void CenterView()
+    {
+        if (Nodes.Count == 0)
+        {
+            ViewportLocation = new Point(0, 0);
+            Zoom = 1.0;
+            return;
+        }
+
+        double minX = Nodes.Min(n => n.Location.X);
+        double maxX = Nodes.Max(n => n.Location.X + 220);
+        double minY = Nodes.Min(n => n.Location.Y);
+        double maxY = Nodes.Max(n => n.Location.Y + 120);
+
+        double centerX = (minX + maxX) / 2.0;
+        double centerY = (minY + maxY) / 2.0;
+
+        ViewportLocation = new Point(centerX - 400, centerY - 250);
+        Zoom = 1.0;
     }
 
     [RelayCommand]

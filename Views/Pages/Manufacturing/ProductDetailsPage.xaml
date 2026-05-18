@@ -366,6 +366,9 @@
                                 SelectedItem="{Binding SelectedItem}"
                                 DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                 ConnectionCompletedCommand="{Binding CreateConnectionCommand}"
+                                ViewportZoom="{Binding Zoom, Mode=TwoWay}"
+                                ViewportLocation="{Binding ViewportLocation, Mode=TwoWay}"
+                                AutoPanSpeed="15"
                                 AllowDrop="True"
                                 Drop="OnNodifyEditorDrop"
                                 Background="Transparent">
@@ -444,11 +447,91 @@
                                     </DataTemplate>
                                 </nodify:NodifyEditor.ConnectionTemplate>
                             </nodify:NodifyEditor>
+                            <!-- Glassmorphism Floating Canvas Toolbar (Bottom-Left overlay) -->
+                            <Border VerticalAlignment="Bottom" HorizontalAlignment="Left" 
+                                    Margin="16" 
+                                    Background="{DynamicResource SystemFillColorNeutralBackgroundBrush}"
+                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="1" 
+                                    CornerRadius="8"
+                                    Padding="6"
+                                    Panel.ZIndex="100">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="15" ShadowDepth="2" Direction="270" Opacity="0.15" Color="Black" />
+                                </Border.Effect>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Zoom Out -->
+                                    <ui:Button Icon="{ui:SymbolIcon Subtract24}" 
+                                               Command="{Binding ViewModel.DagEditor.ZoomOutCommand}" 
+                                               ToolTip="Zoom Out"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+                                    
+                                    <!-- Zoom Text -->
+                                    <TextBlock Text="{Binding ViewModel.DagEditor.Zoom, StringFormat={}{0:0%}}" 
+                                               VerticalAlignment="Center" 
+                                               HorizontalAlignment="Center"
+                                               MinWidth="45"
+                                               TextAlignment="Center"
+                                               FontWeight="SemiBold"
+                                               FontSize="11" 
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    
+                                    <!-- Zoom In -->
+                                    <ui:Button Icon="{ui:SymbolIcon Add24}" 
+                                               Command="{Binding ViewModel.DagEditor.ZoomInCommand}" 
+                                               ToolTip="Zoom In"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
 
-                            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12" Orientation="Horizontal">
-                                <ui:Button Content="Auto Layout" Command="{Binding ViewModel.DagEditor.AutoLayoutCommand}" Appearance="Secondary" Margin="0,0,8,0" />
-                                <ui:Button Icon="{ui:SymbolIcon Delete24}" Command="{Binding ViewModel.DagEditor.DeleteSelectedCommand}" Appearance="Secondary" />
-                            </StackPanel>
+                                    <!-- Reset Zoom -->
+                                    <ui:Button Icon="{ui:SymbolIcon ArrowClockwise24}" 
+                                               Command="{Binding ViewModel.DagEditor.ZoomResetCommand}" 
+                                               ToolTip="Reset Zoom (100%)"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+
+                                    <Border Width="1" Height="16" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="6,0" />
+
+                                    <!-- Center View -->
+                                    <ui:Button Icon="{ui:SymbolIcon Home24}" 
+                                               Command="{Binding ViewModel.DagEditor.CenterViewCommand}" 
+                                               ToolTip="Center View on Nodes"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+
+                                    <!-- Auto Layout -->
+                                    <ui:Button Icon="{ui:SymbolIcon Flow24}" 
+                                               Command="{Binding ViewModel.DagEditor.AutoLayoutCommand}" 
+                                               ToolTip="Auto Layout Nodes"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+
+                                    <Border Width="1" Height="16" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="6,0" />
+
+                                    <!-- Delete Selected -->
+                                    <ui:Button Icon="{ui:SymbolIcon Delete24}" 
+                                               Command="{Binding ViewModel.DagEditor.DeleteSelectedCommand}" 
+                                               ToolTip="Delete Selected Element (Del / Backspace)"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+
+                                    <Border Width="1" Height="16" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="6,0" />
+
+                                    <!-- Shortcuts Tooltip -->
+                                    <ui:Button Icon="{ui:SymbolIcon Info24}" 
+                                               ToolTip="Canvas Navigation:&#x0a;• Hold Right-Click + Drag to Pan&#x0a;• Mouse Wheel to Zoom In/Out&#x0a;• Drag from step list to add steps&#x0a;• Click to select nodes or connections&#x0a;• Delete key to delete selected"
+                                               Padding="6"
+                                               Margin="2,0"
+                                               Appearance="Transparent" />
+                                </StackPanel>
+                            </Border>
                         </Grid>
                     </Border>
 
