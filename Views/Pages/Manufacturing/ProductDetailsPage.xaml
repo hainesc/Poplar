@@ -428,17 +428,16 @@
                                     <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
                                         <nodify:Connection Source="{Binding Source.OutputAnchor}"
                                                            Target="{Binding Target.InputAnchor}"
-                                                           IsSelected="{Binding IsSelected, Mode=TwoWay}"
                                                            PreviewMouseDown="OnConnectionPreviewMouseDown">
                                             <nodify:Connection.Style>
                                                 <Style TargetType="{x:Type nodify:Connection}">
                                                     <Setter Property="Stroke" Value="{DynamicResource PaletteGoldBrush}" />
                                                     <Setter Property="StrokeThickness" Value="2" />
                                                     <Style.Triggers>
-                                                        <Trigger Property="IsSelected" Value="True">
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                             <Setter Property="Stroke" Value="{DynamicResource SystemFillColorSuccessBrush}" />
                                                             <Setter Property="StrokeThickness" Value="4" />
-                                                        </Trigger>
+                                                        </DataTrigger>
                                                         <Trigger Property="IsMouseOver" Value="True">
                                                             <Setter Property="StrokeThickness" Value="4" />
                                                             <Setter Property="Cursor" Value="Hand" />
