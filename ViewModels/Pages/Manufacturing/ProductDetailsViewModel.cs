@@ -329,7 +329,7 @@ public partial class ProductDetailsViewModel : ObservableObject, INavigationAwar
     {
         try
         {
-            var dag = DagEditor.ExportToDagFlow(0, $"Flow for Product {_productId}");
+            var dag = DagEditor.ExportToDagFlow(DagEditor.FlowId, $"Flow for Product {_productId}");
             if (dag != null)
             {
                 await _productService.UpdateDagByProductAsync(_productId, dag);

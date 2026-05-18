@@ -49,6 +49,11 @@ public partial class DagEditorViewModel : ObservableObject
     [ObservableProperty] private double _zoom = 1.0;
     [ObservableProperty] private Point _viewportLocation = new Point(0, 0);
 
+    /// <summary>
+    /// Stores the internal database ID of the currently loaded process flow.
+    /// </summary>
+    public int FlowId { get; set; }
+
     public void Initialize(StepMetadata[] metadata)
     {
         _stepMetadata = metadata;
@@ -63,7 +68,15 @@ public partial class DagEditorViewModel : ObservableObject
         SelectedNode = null;
         SelectedConnection = null;
 
-        if (dag == null || dag.nodes == null || dag.nodes.Length == 0)
+        if (dag == null)
+        {
+            FlowId = 0;
+            return;
+        }
+
+        FlowId = dag.id;
+
+        if (dag.nodes == null || dag.nodes.Length == 0)
         {
             return;
         }
