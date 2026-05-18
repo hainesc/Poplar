@@ -228,6 +228,19 @@ public partial class RuntimeViewModel : ObservableObject, IRecipient<Manufacturi
 
     public void Receive(ManufacturingEventMessage message)
     {
+        try
+        {
+            // Print subscription received data directly to the console/output window
+            string json = JsonSerializer.Serialize(message.Event, new JsonSerializerOptions { WriteIndented = false });
+            System.Console.WriteLine($"[Subscription Event] Received: {json}");
+            System.Diagnostics.Debug.WriteLine($"[Subscription Event] Received: {json}");
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"[Subscription Event] Failed to serialize event: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[Subscription Event] Failed to serialize event: {ex.Message}");
+        }
+
         // Safe dispatch to the UI thread
         Application.Current?.Dispatcher?.Invoke(() => HandleEvent(message.Event));
     }
@@ -247,7 +260,7 @@ public partial class RuntimeViewModel : ObservableObject, IRecipient<Manufacturi
             case ManufacturingEvent.Message msg:
                 var level = msg.v1.msgType.ToString();
                 var text = msg.v1.content;
-                var logTime = DateTimeOffset.FromUnixTimeMilliseconds(msg.v1.timestamp).LocalDateTime.ToString("HH:mm:ss");
+                var logTime = DateTimeOffset.FromUnixTimeSeconds(msg.v1.timestamp).LocalDateTime.ToString("HH:mm:ss");
                 
                 ProcessLogs.Insert(0, $"[{logTime}] [{level}] {text}");
                 CurrentInstruction = text;
