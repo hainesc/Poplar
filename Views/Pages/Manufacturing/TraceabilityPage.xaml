@@ -60,7 +60,7 @@
                             <TextBlock Text="Product" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,6" />
                             <ComboBox ItemsSource="{Binding ViewModel.Products}"
                                       SelectedItem="{Binding ViewModel.SelectedProduct, Mode=TwoWay}"
-                                      DisplayMemberPath="Name" />
+                                      DisplayMemberPath="name" />
                         </StackPanel>
 
                         <!-- Work Order ID Filter -->
