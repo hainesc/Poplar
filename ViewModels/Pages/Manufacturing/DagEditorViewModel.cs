@@ -189,10 +189,17 @@ public partial class DagEditorViewModel : ObservableObject
     [RelayCommand]
     private void CreateConnection(object? parameter)
     {
-        if (parameter == null) return;
-        
+        string logPath = "/Users/haines/workspace/csharp/Poplar/debug_log.txt";
         try
         {
+            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Called at {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}. Parameter type: {parameter?.GetType()?.FullName ?? "null"}\r\n");
+            
+            if (parameter == null)
+            {
+                System.IO.File.AppendAllText(logPath, "[CreateConnection] Parameter is null\r\n");
+                return;
+            }
+            
             object? sourceObj = null;
             object? targetObj = null;
 
@@ -201,28 +208,44 @@ public partial class DagEditorViewModel : ObservableObject
             {
                 sourceObj = tuple[0];
                 targetObj = tuple[1];
+                System.IO.File.AppendAllText(logPath, $"[CreateConnection] Parsed as ITuple. Length: {tuple.Length}, Type0: {sourceObj?.GetType()?.FullName}, Type1: {targetObj?.GetType()?.FullName}\r\n");
             }
             else
             {
                 // Fallback for other potential payload structures
                 dynamic args = parameter;
-                try { sourceObj = args.Item1; } catch { sourceObj = args.Source; }
-                try { targetObj = args.Item2; } catch { targetObj = args.Target; }
+                try { sourceObj = args.Item1; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item1\r\n"); } 
+                catch { try { sourceObj = args.Source; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Source\r\n"); } catch { } }
+                
+                try { targetObj = args.Item2; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item2\r\n"); } 
+                catch { try { targetObj = args.Target; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Target\r\n"); } catch { } }
             }
 
             var source = sourceObj as FlowNodeViewModel;
             var target = targetObj as FlowNodeViewModel;
+
+            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Source cast: {source?.Id ?? "null"}, Target cast: {target?.Id ?? "null"}\r\n");
 
             if (source != null && target != null && source != target)
             {
                 if (!Connections.Any(c => c.Source == source && c.Target == target))
                 {
                     Connections.Add(new FlowConnectionViewModel(source, target, new EdgeCondition.Fallback()));
+                    System.IO.File.AppendAllText(logPath, $"[CreateConnection] Connection added successfully. Total connections: {Connections.Count}\r\n");
                 }
+                else
+                {
+                    System.IO.File.AppendAllText(logPath, "[CreateConnection] Connection already exists\r\n");
+                }
+            }
+            else
+            {
+                System.IO.File.AppendAllText(logPath, $"[CreateConnection] Validation failed. source == target? {source == target}\r\n");
             }
         }
         catch (System.Exception ex)
         {
+            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Exception: {ex.Message}\r\n{ex.StackTrace}\r\n");
             System.Diagnostics.Debug.WriteLine($"[Debug] CreateConnection Exception:\n{ex.Message}");
         }
     }
