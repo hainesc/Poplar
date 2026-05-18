@@ -427,7 +427,26 @@
                                 <nodify:NodifyEditor.ConnectionTemplate>
                                     <DataTemplate DataType="{x:Type vm:FlowConnectionViewModel}">
                                         <nodify:Connection Source="{Binding Source.OutputAnchor}"
-                                                           Target="{Binding Target.InputAnchor}" />
+                                                           Target="{Binding Target.InputAnchor}"
+                                                           IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                                                           PreviewMouseDown="OnConnectionPreviewMouseDown">
+                                            <nodify:Connection.Style>
+                                                <Style TargetType="{x:Type nodify:Connection}">
+                                                    <Setter Property="Stroke" Value="{DynamicResource PaletteGoldBrush}" />
+                                                    <Setter Property="StrokeThickness" Value="2" />
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter Property="Stroke" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                                            <Setter Property="StrokeThickness" Value="4" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="StrokeThickness" Value="4" />
+                                                            <Setter Property="Cursor" Value="Hand" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </nodify:Connection.Style>
+                                        </nodify:Connection>
                                     </DataTemplate>
                                 </nodify:NodifyEditor.ConnectionTemplate>
                             </nodify:NodifyEditor>
@@ -658,6 +677,14 @@
                                         <TextBlock Text="EXPECTED VALUE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,8" />
                                         <ui:TextBox Text="{Binding VariableExpectedValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Value" />
                                     </StackPanel>
+                                    
+                                    <!-- Remove Connection Button -->
+                                    <ui:Button Appearance="Secondary" 
+                                               Content="Remove Connection" 
+                                               Icon="{ui:SymbolIcon Delete24}"
+                                               Command="{Binding DataContext.ViewModel.DagEditor.DeleteSelectedCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                               Foreground="Red"
+                                               HorizontalAlignment="Stretch" Margin="0,16,0,0" />
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>

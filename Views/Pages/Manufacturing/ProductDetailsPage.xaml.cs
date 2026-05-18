@@ -56,4 +56,13 @@ public partial class ProductDetailsPage : INavigationAware
             }
         }
     }
+
+    private void OnConnectionPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is FlowConnectionViewModel connectionVm)
+        {
+            ViewModel.DagEditor.SelectedItem = connectionVm;
+            e.Handled = true;
+        }
+    }
 }

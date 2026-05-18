@@ -25,9 +25,19 @@ public partial class DagEditorViewModel : ObservableObject
         get => _selectedItem;
         set
         {
+            if (_selectedItem is FlowConnectionViewModel oldConn)
+            {
+                oldConn.IsSelected = false;
+            }
+
             SetProperty(ref _selectedItem, value);
             SelectedNode = value as FlowNodeViewModel;
             SelectedConnection = value as FlowConnectionViewModel;
+
+            if (SelectedConnection != null)
+            {
+                SelectedConnection.IsSelected = true;
+            }
         }
     }
 

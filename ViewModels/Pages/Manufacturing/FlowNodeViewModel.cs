@@ -225,6 +225,7 @@ public partial class FlowConnectionViewModel : ObservableObject
 {
     [ObservableProperty] private FlowNodeViewModel? _source;
     [ObservableProperty] private FlowNodeViewModel? _target;
+    [ObservableProperty] private bool _isSelected;
     
     // UI Properties for Edge Condition
     [ObservableProperty] private string _conditionType = "Fallback";
