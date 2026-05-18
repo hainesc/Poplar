@@ -231,9 +231,10 @@ public partial class RuntimeViewModel : ObservableObject, IRecipient<Manufacturi
         try
         {
             // Print subscription received data directly to the console/output window
-            string json = JsonSerializer.Serialize(message.Event, new JsonSerializerOptions { WriteIndented = false });
-            System.Console.WriteLine($"[Subscription Event] Received: {json}");
-            System.Diagnostics.Debug.WriteLine($"[Subscription Event] Received: {json}");
+            string eventName = message.Event.GetType().Name;
+            string json = JsonSerializer.Serialize(message.Event, message.Event.GetType(), new JsonSerializerOptions { WriteIndented = false });
+            System.Console.WriteLine($"[Subscription Event] Received {eventName}: {json}");
+            System.Diagnostics.Debug.WriteLine($"[Subscription Event] Received {eventName}: {json}");
         }
         catch (System.Exception ex)
         {
