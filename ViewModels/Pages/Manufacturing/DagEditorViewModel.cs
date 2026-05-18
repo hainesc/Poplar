@@ -189,13 +189,16 @@ public partial class DagEditorViewModel : ObservableObject
     [RelayCommand]
     private void CreateConnection(object? parameter)
     {
-        string logPath = "/Users/haines/workspace/csharp/Poplar/debug_log.txt";
+        string logPath = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
         try
         {
-            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Called at {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}. Parameter type: {parameter?.GetType()?.FullName ?? "null"}\r\n");
+            string msg = $"[CreateConnection] Called at {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}. Parameter type: {parameter?.GetType()?.FullName ?? "null"}";
+            System.Diagnostics.Debug.WriteLine(msg);
+            System.IO.File.AppendAllText(logPath, msg + "\r\n");
             
             if (parameter == null)
             {
+                System.Diagnostics.Debug.WriteLine("[CreateConnection] Parameter is null");
                 System.IO.File.AppendAllText(logPath, "[CreateConnection] Parameter is null\r\n");
                 return;
             }
@@ -208,45 +211,83 @@ public partial class DagEditorViewModel : ObservableObject
             {
                 sourceObj = tuple[0];
                 targetObj = tuple[1];
-                System.IO.File.AppendAllText(logPath, $"[CreateConnection] Parsed as ITuple. Length: {tuple.Length}, Type0: {sourceObj?.GetType()?.FullName}, Type1: {targetObj?.GetType()?.FullName}\r\n");
+                string parseMsg = $"[CreateConnection] Parsed as ITuple. Length: {tuple.Length}, Type0: {sourceObj?.GetType()?.FullName}, Type1: {targetObj?.GetType()?.FullName}";
+                System.Diagnostics.Debug.WriteLine(parseMsg);
+                System.IO.File.AppendAllText(logPath, parseMsg + "\r\n");
             }
             else
             {
                 // Fallback for other potential payload structures
                 dynamic args = parameter;
-                try { sourceObj = args.Item1; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item1\r\n"); } 
-                catch { try { sourceObj = args.Source; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Source\r\n"); } catch { } }
+                try 
+                { 
+                    sourceObj = args.Item1; 
+                    System.Diagnostics.Debug.WriteLine("[CreateConnection] Found Item1");
+                    System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item1\r\n"); 
+                } 
+                catch 
+                { 
+                    try 
+                    { 
+                        sourceObj = args.Source; 
+                        System.Diagnostics.Debug.WriteLine("[CreateConnection] Found Source");
+                        System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Source\r\n"); 
+                    } 
+                    catch { } 
+                }
                 
-                try { targetObj = args.Item2; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item2\r\n"); } 
-                catch { try { targetObj = args.Target; System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Target\r\n"); } catch { } }
+                try 
+                { 
+                    targetObj = args.Item2; 
+                    System.Diagnostics.Debug.WriteLine("[CreateConnection] Found Item2");
+                    System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Item2\r\n"); 
+                } 
+                catch 
+                { 
+                    try 
+                    { 
+                        targetObj = args.Target; 
+                        System.Diagnostics.Debug.WriteLine("[CreateConnection] Found Target");
+                        System.IO.File.AppendAllText(logPath, "[CreateConnection] Found Target\r\n"); 
+                    } 
+                    catch { } 
+                }
             }
 
             var source = sourceObj as FlowNodeViewModel;
             var target = targetObj as FlowNodeViewModel;
 
-            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Source cast: {source?.Id ?? "null"}, Target cast: {target?.Id ?? "null"}\r\n");
+            string castMsg = $"[CreateConnection] Source cast: {source?.Id ?? "null"}, Target cast: {target?.Id ?? "null"}";
+            System.Diagnostics.Debug.WriteLine(castMsg);
+            System.IO.File.AppendAllText(logPath, castMsg + "\r\n");
 
             if (source != null && target != null && source != target)
             {
                 if (!Connections.Any(c => c.Source == source && c.Target == target))
                 {
                     Connections.Add(new FlowConnectionViewModel(source, target, new EdgeCondition.Fallback()));
-                    System.IO.File.AppendAllText(logPath, $"[CreateConnection] Connection added successfully. Total connections: {Connections.Count}\r\n");
+                    string successMsg = $"[CreateConnection] Connection added successfully. Total connections: {Connections.Count}";
+                    System.Diagnostics.Debug.WriteLine(successMsg);
+                    System.IO.File.AppendAllText(logPath, successMsg + "\r\n");
                 }
                 else
                 {
+                    System.Diagnostics.Debug.WriteLine("[CreateConnection] Connection already exists");
                     System.IO.File.AppendAllText(logPath, "[CreateConnection] Connection already exists\r\n");
                 }
             }
             else
             {
-                System.IO.File.AppendAllText(logPath, $"[CreateConnection] Validation failed. source == target? {source == target}\r\n");
+                string failMsg = $"[CreateConnection] Validation failed. source == target? {source == target}";
+                System.Diagnostics.Debug.WriteLine(failMsg);
+                System.IO.File.AppendAllText(logPath, failMsg + "\r\n");
             }
         }
         catch (System.Exception ex)
         {
-            System.IO.File.AppendAllText(logPath, $"[CreateConnection] Exception: {ex.Message}\r\n{ex.StackTrace}\r\n");
-            System.Diagnostics.Debug.WriteLine($"[Debug] CreateConnection Exception:\n{ex.Message}");
+            string errMsg = $"[CreateConnection] Exception: {ex.Message}\r\n{ex.StackTrace}";
+            System.Diagnostics.Debug.WriteLine(errMsg);
+            System.IO.File.AppendAllText(logPath, errMsg + "\r\n");
         }
     }
 
