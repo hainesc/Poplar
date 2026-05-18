@@ -373,12 +373,7 @@
                                 <nodify:NodifyEditor.InputBindings>
                                     <KeyBinding Key="Delete" Command="{Binding DeleteSelectedCommand}" />
                                     <KeyBinding Key="Backspace" Command="{Binding DeleteSelectedCommand}" />
-                                </nodify:NodifyEditor.InputBindings>
-
-                                <nodify:NodifyEditor.PendingConnection>
-                                    <nodify:PendingConnection CompletedCommand="{Binding CreateConnectionCommand}" />
-                                </nodify:NodifyEditor.PendingConnection>
-                                
+                                </nodify:NodifyEditor.InputBindings>                                
                                 <nodify:NodifyEditor.Resources>
                                     <Style TargetType="{x:Type nodify:PendingConnection}">
                                         <Setter Property="Stroke" Value="{DynamicResource SystemFillColorSuccessBrush}" />
