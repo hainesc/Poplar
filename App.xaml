@@ -25,6 +25,9 @@
                 <ResourceDictionary Source="Controls/PageControlDocumentation.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- Premium Color Palette Brushes -->
+            <SolidColorBrush x:Key="PaletteGoldBrush" Color="#DAA520" />
+
             <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <helpers:ThemeToIndexConverter x:Key="ThemeToIndexConverter" />
             <helpers:PaneDisplayModeToIndexConverter x:Key="PaneDisplayModeToIndexConverter" />
